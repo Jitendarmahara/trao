@@ -1,0 +1,3 @@
+# This folder will hold local test fixtures:
+#   - a fake company website (buried hiring page, robots.txt, a dead link) for crawler tests
+#   - a sample cases.json for the Section 9 batch command

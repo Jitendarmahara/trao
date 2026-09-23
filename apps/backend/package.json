@@ -1,0 +1,14 @@
+{
+  "name": "@interview-prep-kit/backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express API + batch CLI. Reuses @interview-prep-kit/core for all pipeline logic.",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@interview-prep-kit/core": "*"
+  }
+}
