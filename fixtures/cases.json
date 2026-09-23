@@ -1,0 +1,14 @@
+[
+  {
+    "id": "case-01",
+    "jd": "Senior Backend Engineer\n\nWe are looking for an engineer with 5+ years of Node.js and strong PostgreSQL experience. Experience mentoring junior engineers is required. Familiarity with Redis is a plus.",
+    "company_url": "https://example.com",
+    "days": 5
+  },
+  {
+    "id": "case-02",
+    "jd": "Frontend Engineer\n\nReact and TypeScript required. Strong CSS and accessibility skills. Experience with Next.js is a bonus.",
+    "company_url": "https://example.org",
+    "days": 7
+  }
+]

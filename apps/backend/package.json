@@ -6,9 +6,12 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "tsx src/index.ts"
+    "start": "tsx src/index.ts",
+    "evaluate": "tsx src/evaluate.ts"
   },
   "dependencies": {
-    "@interview-prep-kit/core": "*"
+    "@interview-prep-kit/core": "*",
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
   }
 }
