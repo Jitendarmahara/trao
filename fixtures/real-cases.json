@@ -1,0 +1,37 @@
+[
+  {
+    "id": "real-stripe-backend",
+    "company_url": "https://stripe.com",
+    "days": 7,
+    "role": "Senior Backend Engineer",
+    "jd": "Senior Backend Engineer\n\nWe are looking for a Senior Backend Engineer to build reliable, high-scale services and APIs.\n\nRequirements:\n- 5+ years of backend engineering experience\n- Strong experience with TypeScript or Node.js\n- Strong PostgreSQL experience\n- Experience designing distributed systems\n- Experience with REST APIs and event-driven systems\n- Experience with AWS or similar cloud platforms\n- Experience mentoring engineers\n- Strong communication and collaboration skills\n\nNice to have:\n- Experience with payments or financial systems\n- Experience with Kafka\n- Experience with Kubernetes"
+  },
+  {
+    "id": "real-shopify-backend",
+    "company_url": "https://www.shopify.com",
+    "days": 5,
+    "role": "Backend Engineer",
+    "jd": "Backend Engineer\n\nWe are hiring a Backend Engineer to build scalable commerce infrastructure.\n\nRequirements:\n- 3+ years of backend development experience\n- Strong Ruby, Node.js, or similar backend experience\n- Experience building REST APIs\n- Strong SQL and relational database knowledge\n- Experience with distributed systems\n- Experience working with high-traffic applications\n- Strong problem-solving skills\n- Ability to work effectively with product and engineering teams\n\nNice to have:\n- E-commerce experience\n- Experience with GraphQL\n- Experience with Kubernetes\n- Experience with event-driven architecture"
+  },
+  {
+    "id": "real-linear-fullstack",
+    "company_url": "https://linear.app",
+    "days": 3,
+    "role": "Senior Full Stack Engineer",
+    "jd": "Senior Full Stack Engineer\n\nRequirements:\n- 4+ years of software engineering experience\n- Strong TypeScript and React experience\n- Strong backend development experience\n- Experience designing APIs\n- Experience with PostgreSQL\n- Experience building polished user-facing products\n- Strong understanding of software architecture\n- Strong communication and collaboration skills\n\nNice to have:\n- Experience with AI-powered products\n- Experience with GraphQL\n- Experience with real-time systems\n- Experience at a fast-growing startup"
+  },
+  {
+    "id": "real-notion-ai",
+    "company_url": "https://www.notion.com",
+    "days": 4,
+    "role": "Software Engineer, AI",
+    "jd": "Software Engineer, AI\n\nRequirements:\n- 3+ years of software engineering experience\n- Strong TypeScript experience\n- Experience building AI-powered applications\n- Experience with APIs and distributed services\n- Experience working with databases\n- Strong debugging and problem-solving skills\n- Ability to work cross-functionally\n- Strong written and verbal communication\n\nNice to have:\n- Experience with LLM applications\n- Experience with RAG systems\n- Experience with agentic systems\n- Experience with React"
+  },
+  {
+    "id": "real-airbnb-backend",
+    "company_url": "https://www.airbnb.com",
+    "days": 7,
+    "role": "Backend Engineer",
+    "jd": "Backend Engineer\n\nRequirements:\n- 4+ years of backend engineering experience\n- Experience with Java, Python, Go, or Node.js\n- Experience building scalable distributed systems\n- Strong SQL and database fundamentals\n- Experience designing APIs\n- Experience with caching and asynchronous processing\n- Strong testing and debugging skills\n- Strong communication skills\n\nNice to have:\n- Marketplace experience\n- Experience with recommendation systems\n- Experience with high-scale consumer applications\n- Experience with Kubernetes"
+  }
+]

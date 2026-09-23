@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "evaluate": "tsx apps/backend/src/evaluate.ts"
+    "evaluate": "tsx apps/backend/src/evaluate.ts",
+    "evaluate:real": "tsx apps/backend/src/evaluate-real.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

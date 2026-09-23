@@ -1,12 +1,20 @@
-import { runCoverageLoop } from '../coverage/index.js';
-import { extractRequirements } from '../extraction/index.js';
+import { runCoverageLoop, type CoveragePassInfo } from '../coverage/index.js';
+import { extractRequirements, type ExtractedRole } from '../extraction/index.js';
 import { generateCompanyBrief, generateFlashcards, generateQuestions } from '../generation/index.js';
 import {
   researchInterviewProcess,
   type InterviewResearch,
   type SearchProvider,
 } from '../interview-research/index.js';
-import { validateKit, type Kit } from '../kit/index.js';
+import {
+  validateKit,
+  type CompanyBrief,
+  type Coverage,
+  type Flashcard,
+  type Kit,
+  type Question,
+  type Schedule,
+} from '../kit/index.js';
 import type { LlmClient } from '../llm/index.js';
 import { crawlCompany, type CompanyResearch, type SkippedSource } from '../retrieval/index.js';
 import { allocateSchedule } from '../schedule/index.js';
@@ -30,6 +38,20 @@ export interface PipelineInput {
   days: number;
 }
 
+/**
+ * Structured intermediate evidence emitted as the pipeline runs. This is a pure
+ * observability hook for evaluation/reporting — it never changes pipeline output.
+ */
+export type PipelineArtifact =
+  | { type: 'extraction'; role: ExtractedRole }
+  | { type: 'company-research'; research: CompanyResearch }
+  | { type: 'interview-research'; research: InterviewResearch }
+  | { type: 'company-brief'; brief: CompanyBrief }
+  | { type: 'initial-generation'; questions: Question[]; flashcards: Flashcard[] }
+  | { type: 'coverage-pass'; info: CoveragePassInfo }
+  | { type: 'coverage-final'; coverage: Coverage; questions: Question[] }
+  | { type: 'schedule'; schedule: Schedule };
+
 export interface PipelineOptions {
   llm: Pick<LlmClient, 'callJSON'>;
   /** Search backend for interview research. Absent → honest "no info". */
@@ -39,6 +61,8 @@ export interface PipelineOptions {
   /** Allow localhost targets (Section 9 batch). Default false. */
   allowLocal?: boolean;
   onProgress?: (stage: PipelineStage, detail?: string) => void;
+  /** Optional observability hook receiving intermediate evidence (reporting). */
+  onArtifact?: (artifact: PipelineArtifact) => void;
   maxPasses?: number;
   maxPerRequirement?: number;
 }
@@ -89,6 +113,7 @@ export async function runPipeline(
   options: PipelineOptions,
 ): Promise<PipelineResult> {
   const emit = options.onProgress ?? ((): void => {});
+  const artifact = options.onArtifact ?? ((): void => {});
 
   // Reject invalid input up front — days must be a positive integer.
   if (!Number.isInteger(input.days) || input.days < 1) {
@@ -105,6 +130,7 @@ export async function runPipeline(
   } catch (err) {
     throw new PipelineError('EXTRACTION_FAILED', err instanceof Error ? err.message : String(err));
   }
+  artifact({ type: 'extraction', role });
 
   // 2. Crawl the company site (honest empty result on failure, never throws).
   emit('crawling');
@@ -123,6 +149,7 @@ export async function runPipeline(
       otherPages: [],
     };
   }
+  artifact({ type: 'company-research', research: companyResearch });
 
   // 3. Research public interview discussion (honest "not found" without a provider;
   //    researchInterviewProcess already guards its own calls — this is belt-and-suspenders).
@@ -149,6 +176,7 @@ export async function runPipeline(
       sources: [],
     };
   }
+  artifact({ type: 'interview-research', research: interviewResearch });
 
   // 4. Generate brief + questions + flashcards, fed by the research above.
   emit('generating');
@@ -165,6 +193,8 @@ export async function runPipeline(
   } catch (err) {
     throw new PipelineError('GENERATION_FAILED', err instanceof Error ? err.message : String(err));
   }
+  artifact({ type: 'company-brief', brief });
+  artifact({ type: 'initial-generation', questions, flashcards });
 
   // 5. Deterministic coverage loop — targeted regeneration closes must-have gaps.
   emit('covering');
@@ -177,7 +207,9 @@ export async function runPipeline(
         { role: { title: role.title, requirements: missing }, companyResearch, interviewResearch },
         { llm: options.llm, maxPerRequirement: options.maxPerRequirement },
       ),
+    onPass: (info) => artifact({ type: 'coverage-pass', info }),
   });
+  artifact({ type: 'coverage-final', coverage: covered.coverage, questions: covered.questions });
 
   // A shipped kit must NEVER contain an uncovered must-have requirement (the brief:
   // "the kit does not ship with uncovered must-have requirements"). If the bounded
@@ -192,6 +224,7 @@ export async function runPipeline(
   // 6. Deterministic schedule allocation across exactly `days` days.
   emit('scheduling');
   const schedule = allocateSchedule(covered.questions, role.requirements, input.days);
+  artifact({ type: 'schedule', schedule });
 
   // 7. Assemble and validate the kit before returning it.
   emit('validating');
