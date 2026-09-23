@@ -48,7 +48,12 @@ export function allocateSchedule(
   requirements: Requirement[],
   days: number,
 ): Schedule {
-  const dayCount = Math.max(1, Math.floor(days));
+  // Valid days must be a positive integer. Do NOT silently coerce NaN, negatives
+  // or fractions into a schedule — reject them so the caller handles bad input.
+  if (!Number.isInteger(days) || days < 1) {
+    throw new RangeError(`days must be a positive integer, got ${String(days)}`);
+  }
+  const dayCount = days;
   const mustIds = new Set(requirements.filter((r) => r.priority === 'must').map((r) => r.id));
 
   const weight = (q: Question): number =>

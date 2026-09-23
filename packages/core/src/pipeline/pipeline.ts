@@ -1,7 +1,11 @@
 import { runCoverageLoop } from '../coverage/index.js';
 import { extractRequirements } from '../extraction/index.js';
 import { generateCompanyBrief, generateFlashcards, generateQuestions } from '../generation/index.js';
-import { researchInterviewProcess, type SearchProvider } from '../interview-research/index.js';
+import {
+  researchInterviewProcess,
+  type InterviewResearch,
+  type SearchProvider,
+} from '../interview-research/index.js';
 import { validateKit, type Kit } from '../kit/index.js';
 import type { LlmClient } from '../llm/index.js';
 import { crawlCompany, type CompanyResearch, type SkippedSource } from '../retrieval/index.js';
@@ -48,7 +52,12 @@ export interface PipelineResult {
 /** A structured, coded failure the batch/backend can record and report. */
 export class PipelineError extends Error {
   constructor(
-    readonly code: 'EXTRACTION_FAILED' | 'GENERATION_FAILED' | 'INVALID_KIT',
+    readonly code:
+      | 'INVALID_INPUT'
+      | 'EXTRACTION_FAILED'
+      | 'GENERATION_FAILED'
+      | 'COVERAGE_INCOMPLETE'
+      | 'INVALID_KIT',
     message: string,
   ) {
     super(message);
@@ -80,6 +89,12 @@ export async function runPipeline(
   options: PipelineOptions,
 ): Promise<PipelineResult> {
   const emit = options.onProgress ?? ((): void => {});
+
+  // Reject invalid input up front — days must be a positive integer.
+  if (!Number.isInteger(input.days) || input.days < 1) {
+    throw new PipelineError('INVALID_INPUT', `days must be a positive integer, got ${String(input.days)}`);
+  }
+
   const companyName = input.companyName?.trim() || deriveCompanyName(input.companyUrl);
 
   // 1. Extract requirements from the pasted JD (no retrieval).
@@ -109,17 +124,31 @@ export async function runPipeline(
     };
   }
 
-  // 3. Research public interview discussion (honest "not found" without a provider).
+  // 3. Research public interview discussion (honest "not found" without a provider;
+  //    researchInterviewProcess already guards its own calls — this is belt-and-suspenders).
   emit('interview-research');
-  const interviewResearch = await researchInterviewProcess(
-    { name: companyName, url: input.companyUrl },
-    {
-      searchProvider: options.searchProvider,
-      llm: options.llm,
-      fetchFn: options.fetchFn,
-      allowLocal: options.allowLocal,
-    },
-  );
+  let interviewResearch: InterviewResearch;
+  try {
+    interviewResearch = await researchInterviewProcess(
+      { name: companyName, url: input.companyUrl },
+      {
+        searchProvider: options.searchProvider,
+        llm: options.llm,
+        fetchFn: options.fetchFn,
+        allowLocal: options.allowLocal,
+      },
+    );
+  } catch {
+    interviewResearch = {
+      found: false,
+      summary: 'No public information about the interview process was found.',
+      rounds: [],
+      hasTakeHome: false,
+      hasSystemDesign: false,
+      behaviouralEmphasis: false,
+      sources: [],
+    };
+  }
 
   // 4. Generate brief + questions + flashcards, fed by the research above.
   emit('generating');
@@ -149,6 +178,16 @@ export async function runPipeline(
         { llm: options.llm, maxPerRequirement: options.maxPerRequirement },
       ),
   });
+
+  // A shipped kit must NEVER contain an uncovered must-have requirement (the brief:
+  // "the kit does not ship with uncovered must-have requirements"). If the bounded
+  // loop could not close every gap, fail the case rather than return a broken kit.
+  if (covered.coverage.uncovered_requirement_ids.length > 0) {
+    throw new PipelineError(
+      'COVERAGE_INCOMPLETE',
+      `Uncovered must-have requirement(s) after ${covered.coverage.passes} pass(es): ${covered.coverage.uncovered_requirement_ids.join(', ')}`,
+    );
+  }
 
   // 6. Deterministic schedule allocation across exactly `days` days.
   emit('scheduling');

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { runPipeline, type PipelineStage } from './pipeline.js';
+import { PipelineError, runPipeline, type PipelineStage } from './pipeline.js';
 import { StaticSearchProvider } from '../interview-research/index.js';
 import { validateKit } from '../kit/index.js';
 import type { LlmClient } from '../llm/index.js';
@@ -121,6 +121,68 @@ describe('runPipeline (end to end, offline)', () => {
     expect(result.kit.role.requirements).toEqual([]);
     expect(result.kit.questions).toEqual([]);
     expect(result.kit.coverage.uncovered_requirement_ids).toEqual([]);
+  });
+
+  // A stub for two technical must-have requirements. Only the technical category
+  // runs (no company info, no search provider), so gap behaviour is controllable.
+  function coverageStub(questionIds: (msg: string) => string[]): Pick<LlmClient, 'callJSON'> {
+    const ROLE = {
+      title: 'Backend Engineer',
+      seniority: 'mid',
+      responsibilities: [],
+      requirements: [
+        { text: 'Node', kind: 'technical', priority: 'must' },
+        { text: 'Postgres', kind: 'technical', priority: 'must' },
+      ],
+    };
+    const FLASH = { flashcards: [{ front: 'Q', back: 'A', requirement_ids: ['r1'] }] };
+    return {
+      callJSON: async (opts) => {
+        let r = opts.schema.safeParse(ROLE);
+        if (r.success) return r.data;
+        r = opts.schema.safeParse(FLASH);
+        if (r.success) return r.data;
+        const msg = opts.messages.map((m) => m.content).join('\n');
+        const q = { questions: [{ requirement_ids: questionIds(msg), prompt: 'P', answer_outline: 'A', difficulty: 2 }] };
+        r = opts.schema.safeParse(q);
+        if (r.success) return r.data;
+        throw new Error('unhandled schema');
+      },
+    };
+  }
+  const idsInMessage = (msg: string): string[] =>
+    [...msg.matchAll(/\br(\d+)\b/g)].map((m) => `r${m[1]}`);
+  const unreachable: FetchFn = async () => new Response('down', { status: 500 });
+
+  it('closes a must-have gap via targeted regeneration (final kit fully covered)', async () => {
+    // First draft covers only the FIRST listed requirement → r2 left uncovered.
+    // The targeted regen call lists only r2, so it covers r2 on the second pass.
+    const result = await runPipeline(
+      { jd: 'Backend role. Node and Postgres required.', companyUrl: 'http://acme.test', days: 3 },
+      { llm: coverageStub((msg) => idsInMessage(msg).slice(0, 1)), fetchFn: unreachable },
+    );
+    expect(result.kit.coverage.uncovered_requirement_ids).toEqual([]);
+    expect(result.kit.coverage.passes).toBe(2);
+    expect(result.kit.questions.some((q) => q.requirement_ids.includes('r2'))).toBe(true);
+  });
+
+  it('throws COVERAGE_INCOMPLETE when a must-have can never be covered', async () => {
+    // Always returns r1 → r2 can never be covered, even after regeneration.
+    await expect(
+      runPipeline(
+        { jd: 'Backend role. Node and Postgres required.', companyUrl: 'http://acme.test', days: 3 },
+        { llm: coverageStub(() => ['r1']), fetchFn: unreachable },
+      ),
+    ).rejects.toMatchObject({ name: 'PipelineError', code: 'COVERAGE_INCOMPLETE' });
+  });
+
+  it('rejects an invalid day count with a structured error', async () => {
+    await expect(
+      runPipeline(
+        { jd: 'x', companyUrl: 'http://acme.test', days: 0 },
+        { llm: multiStub(CANNED), fetchFn: site() },
+      ),
+    ).rejects.toBeInstanceOf(PipelineError);
   });
 
   it('an unreachable company site is not fatal — honest brief + recorded skip', async () => {

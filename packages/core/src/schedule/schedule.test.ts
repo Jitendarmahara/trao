@@ -105,8 +105,21 @@ describe('allocateSchedule — invariants', () => {
     expect(totalPlaced).toBe(5);
   });
 
-  it('clamps a non-positive day count to 1', () => {
-    expect(allocateSchedule(makeQuestions(3), REQS, 0).days).toHaveLength(1);
+  it('rejects invalid day counts instead of silently coercing them', () => {
+    expect(() => allocateSchedule(makeQuestions(3), REQS, 0)).toThrow(RangeError);
+    expect(() => allocateSchedule(makeQuestions(3), REQS, -2)).toThrow(RangeError);
+    expect(() => allocateSchedule(makeQuestions(3), REQS, 3.5)).toThrow(RangeError);
+    expect(() => allocateSchedule(makeQuestions(3), REQS, Number.NaN)).toThrow(RangeError);
+  });
+
+  it('returns exactly N empty days (valid integer minutes) when there are no questions', () => {
+    const schedule = allocateSchedule([], REQS, 5);
+    expect(schedule.days).toHaveLength(5);
+    for (const d of schedule.days) {
+      expect(d.question_ids).toEqual([]);
+      expect(d.minutes).toBe(0);
+      expect(Number.isInteger(d.minutes)).toBe(true);
+    }
   });
 });
 
