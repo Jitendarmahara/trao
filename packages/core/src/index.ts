@@ -12,6 +12,9 @@
  *   - the deterministic schedule allocator               [Step 7]
  *   - the pipeline that orchestrates them                [Step 8]
  *
- * Right now it is a scaffold; real modules land in the steps above.
+ * Modules land here as they are built.
  */
 export const CORE_VERSION = '0.1.0';
+
+// Step 1 — the exact kit structure (Appendix A) and its validator.
+export * from './kit/index.js';
