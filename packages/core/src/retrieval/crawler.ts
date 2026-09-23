@@ -1,7 +1,7 @@
 import { Fetcher } from './fetcher.js';
 import { extractPage } from './html.js';
 import { scoreLink } from './link-scorer.js';
-import { fetchRobots, type RobotsRules } from './robots.js';
+import { fetchRobots } from './robots.js';
 import { checkUrl } from './url-guard.js';
 import type { CompanyResearch, CrawledPage, FetchFn, SkippedSource } from './types.js';
 
@@ -48,6 +48,7 @@ export async function crawlCompany(
     fetchFn: options.fetchFn,
     timeoutMs: options.timeoutMs,
     maxBytes: options.maxBytes,
+    allowLocal,
   });
 
   const skipped: SkippedSource[] = [];
@@ -65,7 +66,16 @@ export async function crawlCompany(
     };
   }
   const base = guard.url;
-  const robots: RobotsRules = await fetchRobots(base, fetcher);
+  const robotsResult = await fetchRobots(base, fetcher);
+  const robots = robotsResult.rules;
+  // Record a genuine robots.txt retrieval failure (5xx/timeout) — but not a plain
+  // 404, which simply means the site has no robots file (allow-all).
+  if (robotsResult.status !== 200 && robotsResult.status !== 404) {
+    skipped.push({
+      url: new URL('/robots.txt', base).toString(),
+      reason: `robots.txt unavailable (status ${robotsResult.status}) — assuming allow-all`,
+    });
+  }
 
   const visited = new Set<string>();
   const frontier: Candidate[] = [

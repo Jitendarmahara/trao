@@ -23,3 +23,6 @@ coverage/
 .idea/
 .vscode/
 *.swp
+
+# review bundles / scratch
+chat.txt

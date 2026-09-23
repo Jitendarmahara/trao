@@ -1,4 +1,5 @@
 import type { FetchFn } from './types.js';
+import { checkUrl } from './url-guard.js';
 
 export const USER_AGENT = 'InterviewPrepKitBot/0.1 (+https://interview-prep-kit.example/bot)';
 
@@ -11,20 +12,29 @@ export interface FetcherOptions {
   timeoutMs?: number;
   maxBytes?: number;
   allowedContentTypes?: string[];
+  /** Allow private/loopback destinations. Must match the crawl's allowLocal. */
+  allowLocal?: boolean;
+  /** Max redirect hops to follow. Default 5. */
+  maxRedirects?: number;
 }
 
 const defaultFetch: FetchFn = (url, init) => fetch(url, init);
+const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 
 /**
- * Safe HTTP GET for untrusted pages: enforces a timeout, a content-type
- * allowlist and a size cap (§11 — restrict handling to expected content types
- * and sizes). Never throws for network problems — returns a recorded failure.
+ * Safe HTTP GET for untrusted pages. Enforces a timeout, a content-type
+ * allowlist and a size cap (§11), and — critically — follows redirects MANUALLY,
+ * re-running the SSRF guard on every hop so a public URL cannot bounce to a
+ * private/loopback address. Never throws for network problems; returns a
+ * recorded failure instead.
  */
 export class Fetcher {
   private readonly fetchFn: FetchFn;
   private readonly timeoutMs: number;
   private readonly maxBytes: number;
   private readonly allowed: string[];
+  private readonly allowLocal: boolean;
+  private readonly maxRedirects: number;
 
   constructor(options: FetcherOptions = {}) {
     this.fetchFn = options.fetchFn ?? defaultFetch;
@@ -35,52 +45,87 @@ export class Fetcher {
       'application/xhtml+xml',
       'text/plain',
     ];
+    this.allowLocal = options.allowLocal ?? false;
+    this.maxRedirects = options.maxRedirects ?? 5;
   }
 
   async fetch(url: string): Promise<FetchResult> {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
-    try {
-      const res = await this.fetchFn(url, {
-        method: 'GET',
-        redirect: 'follow',
-        signal: controller.signal,
-        headers: {
-          'user-agent': USER_AGENT,
-          accept: 'text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.1',
-        },
-      });
+    let currentUrl = url;
 
-      if (!res.ok) {
-        return { ok: false, status: res.status, url, reason: `HTTP ${res.status}` };
+    for (let redirects = 0; ; redirects++) {
+      // SSRF guard on EVERY hop, including redirect destinations.
+      const guard = checkUrl(currentUrl, { allowLocal: this.allowLocal });
+      if (!guard.ok) return { ok: false, status: 0, url: currentUrl, reason: guard.reason };
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+      try {
+        const res = await this.fetchFn(currentUrl, {
+          method: 'GET',
+          redirect: 'manual',
+          signal: controller.signal,
+          headers: {
+            'user-agent': USER_AGENT,
+            accept: 'text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.1',
+          },
+        });
+
+        // Handle redirects ourselves so each destination is re-validated.
+        if (REDIRECT_STATUSES.has(res.status)) {
+          const location = res.headers.get('location');
+          if (!location) {
+            return { ok: false, status: res.status, url: currentUrl, reason: `redirect without Location (${res.status})` };
+          }
+          if (redirects >= this.maxRedirects) {
+            return { ok: false, status: res.status, url: currentUrl, reason: 'too many redirects' };
+          }
+          let next: URL;
+          try {
+            next = new URL(location, currentUrl);
+          } catch {
+            return { ok: false, status: res.status, url: currentUrl, reason: 'invalid redirect location' };
+          }
+          currentUrl = next.toString();
+          continue;
+        }
+
+        if (!res.ok) {
+          return { ok: false, status: res.status, url: currentUrl, reason: `HTTP ${res.status}` };
+        }
+
+        const contentType = res.headers.get('content-type') ?? '';
+        if (!this.allowed.some((t) => contentType.includes(t))) {
+          return {
+            ok: false,
+            status: res.status,
+            url: currentUrl,
+            reason: `unsupported content-type: ${contentType || 'unknown'}`,
+          };
+        }
+
+        // Reject oversized responses by declared size BEFORE reading the body.
+        const declared = Number(res.headers.get('content-length'));
+        if (Number.isFinite(declared) && declared > this.maxBytes) {
+          return { ok: false, status: res.status, url: currentUrl, reason: 'response too large (declared)' };
+        }
+
+        const body = await res.text();
+        if (Buffer.byteLength(body, 'utf8') > this.maxBytes) {
+          return { ok: false, status: res.status, url: currentUrl, reason: 'response too large' };
+        }
+
+        return { ok: true, status: res.status, url: currentUrl, contentType, body };
+      } catch (err) {
+        const reason =
+          err instanceof Error && err.name === 'AbortError'
+            ? 'timeout'
+            : err instanceof Error
+              ? err.message
+              : 'fetch failed';
+        return { ok: false, status: 0, url: currentUrl, reason };
+      } finally {
+        clearTimeout(timer);
       }
-
-      const contentType = res.headers.get('content-type') ?? '';
-      if (!this.allowed.some((t) => contentType.includes(t))) {
-        return {
-          ok: false,
-          status: res.status,
-          url,
-          reason: `unsupported content-type: ${contentType || 'unknown'}`,
-        };
-      }
-
-      const body = await res.text();
-      if (Buffer.byteLength(body, 'utf8') > this.maxBytes) {
-        return { ok: false, status: res.status, url, reason: 'response too large' };
-      }
-
-      return { ok: true, status: res.status, url, contentType, body };
-    } catch (err) {
-      const reason =
-        err instanceof Error && err.name === 'AbortError'
-          ? 'timeout'
-          : err instanceof Error
-            ? err.message
-            : 'fetch failed';
-      return { ok: false, status: 0, url, reason };
-    } finally {
-      clearTimeout(timer);
     }
   }
 }

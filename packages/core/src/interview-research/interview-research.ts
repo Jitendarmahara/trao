@@ -62,7 +62,7 @@ export async function researchInterviewProcess(
   const { searchProvider, llm, allowLocal = false, maxSources = 3 } = options;
   if (!searchProvider) return noInfo();
 
-  const fetcher = options.fetcher ?? new Fetcher({ fetchFn: options.fetchFn });
+  const fetcher = options.fetcher ?? new Fetcher({ fetchFn: options.fetchFn, allowLocal });
   const query = `${company.name} interview process questions experience`;
 
   let results;

@@ -4,7 +4,15 @@ import { parseRobots } from './robots.js';
 import { scoreLink } from './link-scorer.js';
 import { extractPage } from './html.js';
 import { crawlCompany } from './crawler.js';
+import { Fetcher } from './fetcher.js';
 import type { FetchFn } from './types.js';
+
+function redirect(location: string, status = 302): Response {
+  return new Response(null, { status, headers: { location } });
+}
+function html(body: string, extraHeaders: Record<string, string> = {}): Response {
+  return new Response(body, { status: 200, headers: { 'content-type': 'text/html', ...extraHeaders } });
+}
 
 // ── A fake company site served from an in-memory map (no network) ──
 const SITE: Record<string, { status?: number; contentType?: string; body?: string }> = {
@@ -147,5 +155,50 @@ describe('crawlCompany (end to end, offline)', () => {
     const research = await crawlCompany('http://127.0.0.1/', { fetchFn: fakeSite(SITE) });
     expect(research.pages_used).toHaveLength(0);
     expect(research.skipped[0].reason).toMatch(/private|loopback/);
+  });
+
+  it('records a genuine robots.txt failure (5xx), not a plain 404', async () => {
+    const site: typeof SITE = {
+      'http://acme.test/': { body: '<title>Acme</title>Hello' },
+      'http://acme.test/robots.txt': { status: 500, contentType: 'text/plain', body: 'err' },
+    };
+    const research = await crawlCompany('http://acme.test', { fetchFn: fakeSite(site) });
+    expect(research.skipped.some((s) => s.url.endsWith('/robots.txt'))).toBe(true);
+  });
+});
+
+describe('Fetcher — redirect safety (SSRF)', () => {
+  it('blocks a public URL that redirects to a private/loopback address', async () => {
+    const fetchFn: FetchFn = async (url) =>
+      url === 'http://public.test/' ? redirect('http://127.0.0.1/secret') : html('secret');
+    const res = await new Fetcher({ fetchFn }).fetch('http://public.test/');
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toMatch(/private|loopback/);
+  });
+
+  it('follows a public → public redirect and returns the final page', async () => {
+    const fetchFn: FetchFn = async (url) =>
+      url === 'http://a.test/' ? redirect('http://b.test/page') : html('final page');
+    const res = await new Fetcher({ fetchFn }).fetch('http://a.test/');
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.body).toContain('final page');
+      expect(res.url).toBe('http://b.test/page');
+    }
+  });
+
+  it('bounds an endless redirect chain', async () => {
+    let n = 0;
+    const fetchFn: FetchFn = async () => redirect(`http://loop.test/${n++}`);
+    const res = await new Fetcher({ fetchFn, maxRedirects: 3 }).fetch('http://loop.test/start');
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toMatch(/too many redirects/);
+  });
+
+  it('rejects an oversized response by declared Content-Length before reading it', async () => {
+    const fetchFn: FetchFn = async () => html('small body', { 'content-length': '99999999' });
+    const res = await new Fetcher({ fetchFn, maxBytes: 1000 }).fetch('http://big.test/');
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toMatch(/too large/);
   });
 });

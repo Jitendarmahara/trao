@@ -68,12 +68,19 @@ export function parseRobots(txt: string, userAgent = '*'): RobotsRules {
   };
 }
 
-/** Fetch and parse a site's robots.txt. On any failure, default to allow-all. */
-export async function fetchRobots(base: URL, fetcher: Fetcher): Promise<RobotsRules> {
+/**
+ * Fetch and parse a site's robots.txt. On any failure, default to allow-all —
+ * and report the HTTP status so the caller can record a *real* retrieval error
+ * (a plain 404 just means "no robots file", which is not worth recording).
+ */
+export async function fetchRobots(
+  base: URL,
+  fetcher: Fetcher,
+): Promise<{ rules: RobotsRules; status: number }> {
   const robotsUrl = new URL('/robots.txt', base).toString();
   const res = await fetcher.fetch(robotsUrl);
   if (res.ok && typeof res.body === 'string') {
-    return parseRobots(res.body);
+    return { rules: parseRobots(res.body), status: res.status };
   }
-  return parseRobots('');
+  return { rules: parseRobots(''), status: res.status };
 }

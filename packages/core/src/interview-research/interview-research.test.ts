@@ -80,4 +80,30 @@ describe('researchInterviewProcess', () => {
     );
     expect(research.found).toBe(false);
   });
+
+  it('blocks a search result that redirects to a private/loopback host', async () => {
+    const provider = new StaticSearchProvider([{ url: 'https://pub.test/exp', title: 'exp' }]);
+    const fetchFn: FetchFn = async (url) =>
+      url === 'https://pub.test/exp'
+        ? new Response(null, { status: 302, headers: { location: 'http://127.0.0.1/x' } })
+        : new Response(DISCUSSION, { status: 200, headers: { 'content-type': 'text/html' } });
+    const research = await researchInterviewProcess(
+      { name: 'Acme' },
+      { searchProvider: provider, fetchFn },
+    );
+    expect(research.found).toBe(false); // the only source was blocked, nothing read
+  });
+
+  it('does not invent signals when the discussion is unrelated', async () => {
+    const provider = new StaticSearchProvider([{ url: 'https://blog.test/chat', title: 'chat' }]);
+    const bland = '<title>Chat</title><body>I had a friendly conversation about my background at Acme.</body>';
+    const research = await researchInterviewProcess(
+      { name: 'Acme' },
+      { searchProvider: provider, fetchFn: fakePages({ 'https://blog.test/chat': bland }) },
+    );
+    expect(research.found).toBe(true);
+    expect(research.hasTakeHome).toBe(false);
+    expect(research.hasSystemDesign).toBe(false);
+    expect(research.behaviouralEmphasis).toBe(false);
+  });
 });
