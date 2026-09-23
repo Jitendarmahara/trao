@@ -24,3 +24,6 @@ export * from './llm/index.js';
 
 // Step 3A — company-site crawler (rank links, robots, SSRF guard).
 export * from './retrieval/index.js';
+
+// Step 3B — public interview-process research (first-class stage).
+export * from './interview-research/index.js';
