@@ -18,3 +18,6 @@ export const CORE_VERSION = '0.1.0';
 
 // Step 1 — the exact kit structure (Appendix A) and its validator.
 export * from './kit/index.js';
+
+// Step 2 — the OpenAI-compatible LLM client (rate limit + backoff + JSON safety).
+export * from './llm/index.js';
