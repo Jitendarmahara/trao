@@ -27,3 +27,6 @@ export * from './retrieval/index.js';
 
 // Step 3B — public interview-process research (first-class stage).
 export * from './interview-research/index.js';
+
+// Step 4 — requirement extraction from the job description.
+export * from './extraction/index.js';
