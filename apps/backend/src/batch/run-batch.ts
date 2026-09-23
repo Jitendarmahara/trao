@@ -14,7 +14,11 @@ export interface RunBatchOptions {
   searchProvider?: SearchProvider;
   /** Injected fetch (tests). Real runs use the global fetch. */
   fetchFn?: FetchFn;
-  /** Batch company sites may be served locally, so default to allowing localhost. */
+  /**
+   * Allow private/loopback company URLs. Defaults to FALSE (secure by default) —
+   * the evaluation CLI opts in explicitly, since its harness may serve company
+   * sites from a local address.
+   */
   allowLocal?: boolean;
   onCase?: (id: string, status: 'ok' | 'failed') => void;
 }
@@ -50,7 +54,7 @@ export async function runBatch(casesInput: unknown, options: RunBatchOptions): P
           llm: options.llm,
           searchProvider: options.searchProvider,
           fetchFn: options.fetchFn,
-          allowLocal: options.allowLocal ?? true,
+          allowLocal: options.allowLocal ?? false,
         },
       );
       kits.push({ id: c.id, status: 'ok', kit, error: null });

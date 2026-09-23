@@ -95,4 +95,41 @@ describe('runBatch (Appendix B)', () => {
     expect(out.version).toBe('1.0');
     expect(out.kits).toEqual([]);
   });
+
+  describe('allowLocal is secure by default', () => {
+    // A local company site the fetch would serve if we were allowed to reach it.
+    const localSite: FetchFn = async (url) => {
+      const pages: Record<string, string> = {
+        'http://127.0.0.1:8099/acme/': '<title>Acme</title><a href="/acme/about">About</a>',
+        'http://127.0.0.1:8099/robots.txt': '',
+        'http://127.0.0.1:8099/acme/about': '<title>About</title>Acme is a fintech.',
+      };
+      const body = pages[url] ?? pages[url.replace(/\/$/, '')];
+      const ct = url.endsWith('robots.txt') ? 'text/plain' : 'text/html';
+      return body === undefined
+        ? new Response('nope', { status: 404, headers: { 'content-type': 'text/plain' } })
+        : new Response(body, { status: 200, headers: { 'content-type': ct } });
+    };
+    const localCase = [
+      { id: 'local', jd: 'Backend Engineer. Node + mentoring required.', company_url: 'http://127.0.0.1:8099/acme/', days: 2 },
+    ];
+
+    it('does NOT crawl a loopback company URL by default (no allowLocal)', async () => {
+      const out = await runBatch(localCase, { llm: multiStub(CANNED), fetchFn: localSite });
+      const kit = out.kits[0].kit!;
+      expect(out.kits[0].status).toBe('ok'); // still produces a kit from the JD
+      expect(kit.source.pages_used).toEqual([]); // but the local site was blocked
+    });
+
+    it('DOES crawl the same loopback URL when allowLocal is explicitly true', async () => {
+      const out = await runBatch(localCase, {
+        llm: multiStub(CANNED),
+        fetchFn: localSite,
+        allowLocal: true,
+      });
+      const kit = out.kits[0].kit!;
+      expect(out.kits[0].status).toBe('ok');
+      expect(kit.source.pages_used.length).toBeGreaterThan(0); // reached the local site
+    });
+  });
 });
