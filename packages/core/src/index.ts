@@ -21,3 +21,6 @@ export * from './kit/index.js';
 
 // Step 2 — the OpenAI-compatible LLM client (rate limit + backoff + JSON safety).
 export * from './llm/index.js';
+
+// Step 3A — company-site crawler (rank links, robots, SSRF guard).
+export * from './retrieval/index.js';

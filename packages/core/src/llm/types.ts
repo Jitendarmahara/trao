@@ -25,8 +25,7 @@ export interface CallJSONOptions<T> {
   maxJsonRetries?: number;
 }
 
-/** Injectable fetch so tests need no network. Matches the global `fetch` shape. */
-export type FetchFn = (url: string, init: RequestInit) => Promise<Response>;
+export type { FetchFn } from '../shared/http.js';
 
 /** Injectable sleep so tests need no real waiting. */
 export type SleepFn = (ms: number) => Promise<void>;
