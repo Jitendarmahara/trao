@@ -83,9 +83,12 @@ async function generateForCategory(
  * Generate the question bank with a SEPARATE call per category (so technical and
  * behavioural questions never come from one prompt), and with categories GATED by
  * research: a system-design round only appears when the interview research found
- * one; company-fit only when we actually have company info. Every generated
- * requirement_id is filtered against the ids we supplied, so a hallucinated id can
- * never count toward coverage. Question ids (q1, q2, …) are assigned in code.
+ * one; company-fit only when we actually have company info (behavioural-interview
+ * evidence alone is NOT enough — those questions would be ungrounded). Every
+ * generated requirement_id is filtered against the ids we supplied, and the
+ * per-requirement cap is enforced in CODE (not just the prompt), so a hallucinated
+ * id can never count toward coverage and the bank cannot exceed the configured
+ * maximum. Question ids (q1, q2, …) are assigned in code.
  */
 export async function generateQuestions(
   input: GenerateQuestionsInput,
@@ -93,6 +96,7 @@ export async function generateQuestions(
 ): Promise<Question[]> {
   const reqs = input.role.requirements;
   const iv = input.interviewResearch;
+  const maxPer = options.maxPerRequirement ?? 2;
   const technicalReqs = reqs.filter((r) => r.kind === 'technical' || r.kind === 'domain');
   const behaviouralReqs = reqs.filter((r) => r.kind === 'behavioural');
   const haveCompany = (input.companyResearch?.pages_used.length ?? 0) > 0;
@@ -105,7 +109,9 @@ export async function generateQuestions(
   if (iv?.hasSystemDesign && technicalReqs.length) {
     tasks.push({ category: 'system-design', requirements: technicalReqs });
   }
-  if (haveCompany || iv?.behaviouralEmphasis) {
+  // company-fit needs ACTUAL company info to be grounded — not merely that the
+  // company is known to ask behavioural questions.
+  if (haveCompany) {
     tasks.push({ category: 'company-fit', requirements: reqs });
   }
 
@@ -113,10 +119,23 @@ export async function generateQuestions(
   for (const task of tasks) {
     const generated = await generateForCategory(task.category, task.requirements, input, options);
     const allowed = new Set(task.requirements.map((r) => r.id));
+
+    // Deterministic cap: no requirement may be covered by more than `maxPer`
+    // questions in this category, regardless of what the model returned.
+    const perRequirement = new Map<string, number>();
+    let unlinkedKept = 0;
     for (const g of generated) {
+      const ids = g.requirement_ids.filter((id) => allowed.has(id));
+      if (ids.length === 0) {
+        if (unlinkedKept >= maxPer) continue; // bound questions that map to no requirement
+        unlinkedKept++;
+      } else {
+        if (!ids.every((id) => (perRequirement.get(id) ?? 0) < maxPer)) continue;
+        for (const id of ids) perRequirement.set(id, (perRequirement.get(id) ?? 0) + 1);
+      }
       questions.push({
         id: `q${questions.length + 1}`,
-        requirement_ids: g.requirement_ids.filter((id) => allowed.has(id)),
+        requirement_ids: ids,
         category: task.category,
         prompt: g.prompt.trim(),
         answer_outline: g.answer_outline.trim(),

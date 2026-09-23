@@ -81,6 +81,38 @@ describe('generateQuestions — research changes the output', () => {
     expect(categories.has('behavioural')).toBe(true);
   });
 
+  it('does NOT create company-fit from behavioural emphasis alone (no company info)', async () => {
+    const questions = await generateQuestions(
+      {
+        role: { requirements: REQS },
+        companyResearch: companyResearch(false), // no company info
+        interviewResearch: interview({ behaviouralEmphasis: true }),
+      },
+      { llm: stub(QUESTION_DATA) },
+    );
+    const categories = new Set(questions.map((q) => q.category));
+    expect(categories.has('company-fit')).toBe(false); // ungrounded → omitted
+    expect(categories.has('behavioural')).toBe(true); // emphasis still drives behavioural
+  });
+
+  it('enforces maxPerRequirement in code even if the model returns more', async () => {
+    const fiveForR1 = {
+      questions: Array.from({ length: 5 }, () => ({
+        requirement_ids: ['r1'],
+        prompt: 'P',
+        answer_outline: 'A',
+        difficulty: 2,
+      })),
+    };
+    const questions = await generateQuestions(
+      { role: { requirements: [REQS[0]] } }, // only r1 (technical)
+      { llm: stub(fiveForR1), maxPerRequirement: 2 },
+    );
+    // Model returned 5 for r1; code caps it at 2.
+    expect(questions.filter((q) => q.requirement_ids.includes('r1'))).toHaveLength(2);
+    expect(questions).toHaveLength(2);
+  });
+
   it('assigns sequential ids and filters hallucinated requirement ids', async () => {
     const questions = await generateQuestions(
       { role: { requirements: [REQS[0]] } }, // only r1 is a valid id
