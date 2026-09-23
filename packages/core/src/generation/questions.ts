@@ -115,8 +115,12 @@ export async function generateQuestions(
     tasks.push({ category: 'company-fit', requirements: reqs });
   }
 
+  // Never generate a category with no requirement to anchor to — that would
+  // invent relevance a thin JD does not support (thin JD → thin kit).
+  const activeTasks = tasks.filter((t) => t.requirements.length > 0);
+
   const questions: Question[] = [];
-  for (const task of tasks) {
+  for (const task of activeTasks) {
     const generated = await generateForCategory(task.category, task.requirements, input, options);
     const allowed = new Set(task.requirements.map((r) => r.id));
 

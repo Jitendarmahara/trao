@@ -39,3 +39,6 @@ export * from './coverage/index.js';
 
 // Step 7 — deterministic schedule allocation (arithmetic, front-loaded).
 export * from './schedule/index.js';
+
+// Step 8 — the pipeline that orchestrates every stage end to end.
+export * from './pipeline/index.js';
