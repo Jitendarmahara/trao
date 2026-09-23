@@ -36,3 +36,6 @@ export * from './generation/index.js';
 
 // Step 6 — deterministic coverage check + bounded second-pass loop.
 export * from './coverage/index.js';
+
+// Step 7 — deterministic schedule allocation (arithmetic, front-loaded).
+export * from './schedule/index.js';
