@@ -30,3 +30,6 @@ export * from './interview-research/index.js';
 
 // Step 4 — requirement extraction from the job description.
 export * from './extraction/index.js';
+
+// Step 5 — generation (company brief, questions per category, flashcards).
+export * from './generation/index.js';
