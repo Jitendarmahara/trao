@@ -12,5 +12,10 @@ export default tseslint.config(
       ecmaVersion: 2022,
       sourceType: 'module',
     },
+    rules: {
+      // Allow intentionally-unused args/vars prefixed with _ (e.g. Express error
+      // middleware's required 4th `next` parameter).
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    },
   },
 );
