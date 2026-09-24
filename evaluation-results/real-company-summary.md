@@ -1,6 +1,6 @@
 # Real Company Evaluation Summary
 
-Generated: 2026-09-24T07:18:38.044Z
+Generated: 2026-09-24T10:35:36.412Z
 Report version: 1.0
 Cases: 5 (5 ok, 0 failed)
 
@@ -13,9 +13,9 @@ OK
 
 ## Timing
 
-- Total: 31005 ms
-- LLM calls: 6 (20932 ms, model deepseek-chat)
-- Stages: extracting(1656ms) → crawling(6612ms) → interview-research(3452ms) → generating(19281ms) → covering(0ms) → scheduling(1ms) → validating(3ms) → done(0ms)
+- Total: 37517 ms
+- LLM calls: 6 (24986 ms, model deepseek-chat)
+- Stages: extracting(1290ms) → crawling(4527ms) → interview-research(7997ms) → generating(23700ms) → covering(0ms) → scheduling(1ms) → validating(2ms) → done(0ms)
 
 ## Requirements
 
@@ -48,19 +48,19 @@ OK
 
 _Diagnostics:_
 - Queries: "Stripe interview process", "Stripe engineering interview experience"
-- Returned URLs (12): http://www.quora.com/Stripe-company/What-is-the-engineering-interview-process-like-at-Stripe, https://news.ycombinator.com/item?id=6282512, https://news.ycombinator.com/item?id=6766086, http://www.quora.com/What-is-the-engineering-interview-process-like-at-Stripe?share=1, https://news.ycombinator.com/item?id=8519251, http://www.quora.com/Stripe-company/What-is-the-engineering-interview-process-like-at-Stripe/answer/Greg-Brockman, https://news.ycombinator.com/item?id=6285087, https://news.ycombinator.com/item?id=12351041, https://news.ycombinator.com/item?id=8446186, https://news.ycombinator.com/item?id=29387264, https://news.ycombinator.com/item?id=33525394, https://news.ycombinator.com/item?id=7171725
-- Fetched URLs: (none)
-- Discovered links (interview-relevant): (none)
+- Returned URLs (29): http://www.quora.com/Stripe-company/What-is-the-engineering-interview-process-like-at-Stripe, https://news.ycombinator.com/item?id=6282512, https://news.ycombinator.com/item?id=6766086, http://www.quora.com/What-is-the-engineering-interview-process-like-at-Stripe?share=1, https://news.ycombinator.com/item?id=8519251, http://www.quora.com/Stripe-company/What-is-the-engineering-interview-process-like-at-Stripe/answer/Greg-Brockman, https://news.ycombinator.com/item?id=6285087, https://news.ycombinator.com/item?id=12351041, https://news.ycombinator.com/item?id=8446186, https://dashboard.stripe.com/, https://stripe.com/, https://en.wikipedia.org/wiki/Stripe,_Inc., https://www.nerdwallet.com/business/software/learn/what-is-stripe?msockid=14c2a6f24c876561089cb12c4d54642a, https://www.linkedin.com/company/stripe, https://stripe.com/in/payments, https://interviewing.io/stripe-interview-questions, https://www.glassdoor.com/Interview/Stripe-Interview-Questions-E671932.htm, https://www.tryexponent.com/blog/stripe-interview-process, https://ophyai.com/blog/company-guides/stripe-interview-guide, https://medium.com/@diyaag2020/my-stripe-interview-experience-2025-2026-a-journey-to-the-final-round-19990fa6876a, https://igotanoffer.com/en/advice/stripe-interview-process, https://news.ycombinator.com/item?id=29387264, https://news.ycombinator.com/item?id=33525394, https://news.ycombinator.com/item?id=7171725, https://www.nerdwallet.com/business/software/learn/what-is-stripe?msockid=0d3bd0405b216ee039a4c79e5ab56f60, https://www.glassdoor.com/Interview/Stripe-Software-Engineer-Interview-Questions-EI_IE671932.0,6_KO7,24.htm, https://www.linkjob.ai/interview-questions/stripe-interview-questions/, https://www.tryexponent.com/guides/stripe-software-engineer-interview, https://www.frontend-junction.com/interview-experience/stripe-software-engineer-interview-experience-and-tips
+- Fetched URLs: https://dashboard.stripe.com/, https://stripe.com/, https://en.wikipedia.org/wiki/Stripe,_Inc.
+- Discovered links (interview-relevant): https://stripe.com/docs/dashboard, https://stripe.com/in/newsroom/news/stripe-openai-instant-checkout, https://stripe.com/in/newsroom/news/nvidia-collaboration-with-stripe, https://stripe.com/in/newsroom/news/stripe-ford-agreement, https://stripe.com/in/newsroom/news/google-and-stripe, https://stripe.com/in/newsroom/news/stripe-and-uber, https://ast.wikipedia.org/wiki/Stripe, https://de.wikipedia.org/wiki/Stripe, https://es.wikipedia.org/wiki/Stripe, https://et.wikipedia.org/wiki/Stripe, https://fr.wikipedia.org/wiki/Stripe_(entreprise)
 - Followed links (traversed deeper): (none)
 - Evidence sources (company-specific interview evidence): (none)
-- Rejected: http://www.quora.com/Stripe-company/What-is-the-engineering-interview-process-like-at-Stripe (HTTP 403); https://news.ycombinator.com/item?id=6282512 (fetch failed); https://news.ycombinator.com/item?id=6766086 (fetch failed); http://www.quora.com/What-is-the-engineering-interview-process-like-at-Stripe?share=1 (HTTP 403); https://news.ycombinator.com/item?id=8519251 (fetch failed); http://www.quora.com/Stripe-company/What-is-the-engineering-interview-process-like-at-Stripe/answer/Greg-Brockman (HTTP 403); https://news.ycombinator.com/item?id=6285087 (fetch failed); https://news.ycombinator.com/item?id=12351041 (fetch failed); https://news.ycombinator.com/item?id=8446186 (fetch failed); https://news.ycombinator.com/item?id=29387264 (fetch failed); https://news.ycombinator.com/item?id=33525394 (fetch failed); https://news.ycombinator.com/item?id=7171725 (fetch failed)
+- Rejected: http://www.quora.com/Stripe-company/What-is-the-engineering-interview-process-like-at-Stripe (HTTP 403); https://news.ycombinator.com/item?id=6282512 (fetch failed); https://news.ycombinator.com/item?id=6766086 (fetch failed); http://www.quora.com/What-is-the-engineering-interview-process-like-at-Stripe?share=1 (HTTP 403); https://news.ycombinator.com/item?id=8519251 (fetch failed); http://www.quora.com/Stripe-company/What-is-the-engineering-interview-process-like-at-Stripe/answer/Greg-Brockman (HTTP 403); https://news.ycombinator.com/item?id=6285087 (fetch failed); https://news.ycombinator.com/item?id=12351041 (fetch failed); https://news.ycombinator.com/item?id=8446186 (fetch failed); https://dashboard.stripe.com/ (mentions the company but describes no interview process); https://stripe.com/ (mentions the company but describes no interview process); https://en.wikipedia.org/wiki/Stripe,_Inc. (mentions the company but describes no interview process)
 - Evidence decision → found: false (usable sources: 0)
 - Detected signals: take-home=false, system-design=false, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 26 questions (technical: 18, behavioural: 4, company-fit: 4)
+- 27 questions (technical: 16, behavioural: 4, company-fit: 7)
 
 ## Coverage
 
@@ -72,28 +72,28 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 5+ years of backend engineering experience | must | q1, q2, q23 |
-| r2: Strong experience with TypeScript or Node.js | must | q3, q4, q23 |
-| r3: Strong PostgreSQL experience | must | q5, q6, q23 |
-| r4: Experience designing distributed systems | must | q7, q8, q23 |
-| r5: Experience with REST APIs and event-driven systems | must | q9, q10, q24 |
-| r6: Experience with AWS or similar cloud platforms | must | q11, q12, q24 |
-| r7: Experience mentoring engineers | must | q19, q20, q25 |
-| r8: Strong communication and collaboration skills | must | q21, q22, q25 |
-| r9: Experience with payments or financial systems | nice | q13, q14, q26 |
-| r10: Experience with Kafka | nice | q15, q16, q24 |
-| r11: Experience with Kubernetes | nice | q17, q18, q26 |
+| r1: 5+ years of backend engineering experience | must | q1, q2, q21, q27 |
+| r2: Strong experience with TypeScript or Node.js | must | q3, q4, q21 |
+| r3: Strong PostgreSQL experience | must | q5, q6, q21, q25 |
+| r4: Experience designing distributed systems | must | q2, q7, q21, q24 |
+| r5: Experience with REST APIs and event-driven systems | must | q8, q9, q21, q24 |
+| r6: Experience with AWS or similar cloud platforms | must | q10, q11, q21, q25 |
+| r7: Experience mentoring engineers | must | q17, q18, q23, q27 |
+| r8: Strong communication and collaboration skills | must | q19, q20, q23 |
+| r9: Experience with payments or financial systems | nice | q12, q13, q22, q26 |
+| r10: Experience with Kafka | nice | q14, q15, q22, q26 |
+| r11: Experience with Kubernetes | nice | q11, q16, q22 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
 | 1 | Technical | 4 | 240 |
-| 2 | Technical | 4 | 240 |
-| 3 | Company fit & Behavioural | 4 | 220 |
-| 4 | Technical | 3 | 120 |
-| 5 | Behavioural & Company fit | 4 | 160 |
-| 6 | Technical | 4 | 240 |
+| 2 | Technical & Behavioural | 4 | 240 |
+| 3 | Company fit & Technical | 4 | 220 |
+| 4 | Technical & Behavioural | 4 | 160 |
+| 5 | Behavioural & Company fit | 4 | 140 |
+| 6 | Technical & Company fit | 4 | 220 |
 | 7 | Technical & Company fit | 3 | 120 |
 
 ## Final checks
@@ -101,8 +101,8 @@ _Diagnostics:_
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 11 (must 8, nice 3)
-- Questions: 26 · Flashcards: 11
-- Schedule: 7 days, 26 question slots
+- Questions: 27 · Flashcards: 11
+- Schedule: 7 days, 27 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
@@ -121,9 +121,9 @@ OK
 
 ## Timing
 
-- Total: 33098 ms
-- LLM calls: 6 (23859 ms, model deepseek-chat)
-- Stages: extracting(1511ms) → crawling(969ms) → interview-research(8268ms) → generating(22348ms) → covering(0ms) → scheduling(1ms) → validating(1ms) → done(0ms)
+- Total: 31860 ms
+- LLM calls: 7 (22131 ms, model deepseek-chat)
+- Stages: extracting(1575ms) → crawling(1148ms) → interview-research(9777ms) → generating(19359ms) → covering(0ms) → scheduling(1ms) → validating(0ms) → done(0ms)
 
 ## Requirements
 
@@ -150,26 +150,26 @@ OK
 
 ## Interview research
 
-- Found: false
+- Found: true
 - Signals: take-home=false, system-design=false, behavioural=false
-- Summary: No public information about the interview process was found.
-- Sources: (none)
+- Summary: Shopify's technical interview process for individual contributor roles includes a one-hour conversational recruiter interview called the Life Story, a 40-minute coding exercise focused on algorithmic thinking and problem solving, and a 75-90 minute pair programming session with a Shopify developer. The process can vary by role and team, and leadership roles typically include additional team-specific interviews.
+- Sources: https://shopify.engineering/nail-your-technical-shopify-interview
 
 _Diagnostics:_
 - Queries: "Shopify interview process", "Shopify engineering interview experience"
-- Returned URLs (10): https://github.com/didtheyghostme/didtheyghostme, https://news.ycombinator.com/item?id=43256028, https://news.ycombinator.com/item?id=21294334, https://news.ycombinator.com/item?id=45800249, https://www.shopify.com/, https://www.shopify.com/in, https://en.wikipedia.org/wiki/Shopify, https://apps.shopify.com/, https://themes.shopify.com/, https://play.google.com/store/apps/details?id=com.shopify.mobile&hl=en-US
-- Fetched URLs: https://github.com/didtheyghostme/didtheyghostme, https://www.shopify.com/, https://www.shopify.com/in, https://en.wikipedia.org/wiki/Shopify, https://apps.shopify.com/, https://themes.shopify.com/, https://play.google.com/store/apps/details?id=com.shopify.mobile&hl=en-US, https://www.shopify.com/sell, https://shopify.dev/
-- Discovered links (interview-relevant): https://www.shopify.com/sell, https://shopify.dev/, https://www.shopify.com/editions, https://www.shopify.com/editions/spring2026?utm_source=homepage&utm_medium=content&utm_campaign=spring26edition-launch_Q226SETPNZ&utm_content=dotcom-nav-shopify-ai-toolkit-for-devs-v1, https://hydrogen.shopify.dev/, https://www.shopify.com/in/sell, https://www.shopify.com/in/blog/what-is-shopify, https://www.shopify.com/careers, https://www.shopify.com/in/compare, https://help.shopify.com/en, https://az.wikipedia.org/wiki/Shopify, https://ca.wikipedia.org/wiki/Shopify, https://da.wikipedia.org/wiki/Shopify, https://de.wikipedia.org/wiki/Shopify, https://eo.wikipedia.org/wiki/Shopify, https://apps.shopify.com/stories/guide-built-for-shopify?surface_detail=whats-new&surface_type=navbar, https://apps.shopify.com/stories/guide-build-awards-2026?surface_detail=whats-new&surface_type=navbar, https://apps.shopify.com/login/initiate_shopify_auth_without_shop?redirect_uri=%2F%3Fshow_store_picker%3D1&return_to=%2F, https://apps.shopify.com/stories/guide-built-for-shopify?surface_detail=hero&surface_type=home&surface_version=simplified, https://apps.shopify.com/stories/guide-built-for-shopify?surface_detail=recommended-for-you-bfs&surface_inter_position=1&surface_type=home&surface_version=simplified, https://help.shopify.com/en/, https://community.shopify.com/c/shopify-community-en/ct-p/en, https://play.google.com/store/apps/dev?id=8929232438554100687, https://play.google.com/store/apps/details?id=com.shopify.arrive, https://play.google.com/store/apps/details?id=com.shopify.tinker, https://play.google.com/store/apps/details?id=com.shopify.pos, https://play.google.com/store/apps/details?id=com.shopify.ping, https://www.shopify.com/enterprise/blog/shopify-checkout, https://www.shopify.com/compare/tco, https://www.shopify.com/migrate, https://www.shopify.com/blog/what-is-shopify, https://www.shopify.com/compare
-- Followed links (traversed deeper): https://www.shopify.com/sell, https://shopify.dev/
-- Evidence sources (company-specific interview evidence): (none)
-- Rejected: https://github.com/didtheyghostme/didtheyghostme (interview-process content, but not specific to this company); https://news.ycombinator.com/item?id=43256028 (fetch failed); https://news.ycombinator.com/item?id=21294334 (fetch failed); https://news.ycombinator.com/item?id=45800249 (fetch failed); https://www.shopify.com/ (mentions the company but describes no interview process); https://www.shopify.com/in (mentions the company but describes no interview process); https://en.wikipedia.org/wiki/Shopify (mentions the company but describes no interview process); https://apps.shopify.com/ (mentions the company but describes no interview process); https://themes.shopify.com/ (mentions the company but describes no interview process); https://play.google.com/store/apps/details?id=com.shopify.mobile&hl=en-US (mentions the company but describes no interview process); https://www.shopify.com/sell (mentions the company but describes no interview process); https://shopify.dev/ (mentions the company but describes no interview process)
-- Evidence decision → found: false (usable sources: 0)
+- Returned URLs (25): https://github.com/didtheyghostme/didtheyghostme, https://news.ycombinator.com/item?id=43256028, https://news.ycombinator.com/item?id=21294334, https://forum.vivaldi.net/topic/113545/whatsapp.com-web-use-another-browser-browser-unsupported-for-whatsapp-web, https://forum.vivaldi.net/topic/112404/whatsapp-web-logging-out-constantly, https://forum.vivaldi.net/topic/78284/web-whatsapp-keeps-crashing-after-the-last-update, https://forum.vivaldi.net/topic/78815/whatsapp-web-on-web-panel-became-extremely-slow, https://forum.vivaldi.net/topic/53153/can-t-drag-files-into-whatsapp-web, https://forum.vivaldi.net/topic/31812/whatsapp-web-gif-problem, https://shopify.engineering/nail-your-technical-shopify-interview, https://www.glassdoor.com/Interview/Shopify-Interview-Questions-E675933.htm, https://www.interviewquery.com/interview-guides/shopify, https://www.techprep.app/blog/shopify-interview-process, https://ophyai.com/blog/company-guides/shopify-interview-guide, https://dataford.io/interview-guides/shopify, https://www.52pojie.cn/thread-1958046-1-1.html, https://www.zhihu.com/question/53942965?write, https://www.zhihu.com/question/391917125, https://www.52pojie.cn/thread-1724749-1-1.html, https://jingyan.baidu.com/article/6c67b1d64aa5706686bb1e36.html, https://jingyan.baidu.com/article/5d368d1e06d7837e60c057a1.html, https://www.glassdoor.com/Interview/Shopify-Software-Engineer-Interview-Questions-EI_IE675933.0,7_KO8,25.htm, https://www.tryexponent.com/experiences/shopify-software-engineer-interview-6e938e, https://www.glassdoor.co.in/Interview/Shopify-Interview-Questions-E675933.htm, https://prachub.com/interview-guide/shopify-software-engineer-interview-questions-guide-2026
+- Fetched URLs: https://github.com/didtheyghostme/didtheyghostme, https://forum.vivaldi.net/topic/113545/whatsapp.com-web-use-another-browser-browser-unsupported-for-whatsapp-web, https://forum.vivaldi.net/topic/112404/whatsapp-web-logging-out-constantly, https://forum.vivaldi.net/topic/78284/web-whatsapp-keeps-crashing-after-the-last-update, https://forum.vivaldi.net/topic/78815/whatsapp-web-on-web-panel-became-extremely-slow, https://forum.vivaldi.net/topic/53153/can-t-drag-files-into-whatsapp-web, https://forum.vivaldi.net/topic/31812/whatsapp-web-gif-problem, https://shopify.engineering/nail-your-technical-shopify-interview
+- Discovered links (interview-relevant): (none)
+- Followed links (traversed deeper): (none)
+- Evidence sources (company-specific interview evidence): https://shopify.engineering/nail-your-technical-shopify-interview
+- Rejected: https://github.com/didtheyghostme/didtheyghostme (interview-process content, but not specific to this company); https://news.ycombinator.com/item?id=43256028 (fetch failed); https://news.ycombinator.com/item?id=21294334 (fetch failed); https://forum.vivaldi.net/topic/113545/whatsapp.com-web-use-another-browser-browser-unsupported-for-whatsapp-web (no interview-process evidence); https://forum.vivaldi.net/topic/112404/whatsapp-web-logging-out-constantly (no interview-process evidence); https://forum.vivaldi.net/topic/78284/web-whatsapp-keeps-crashing-after-the-last-update (no interview-process evidence); https://forum.vivaldi.net/topic/78815/whatsapp-web-on-web-panel-became-extremely-slow (no interview-process evidence); https://forum.vivaldi.net/topic/53153/can-t-drag-files-into-whatsapp-web (no interview-process evidence); https://forum.vivaldi.net/topic/31812/whatsapp-web-gif-problem (no interview-process evidence); https://www.glassdoor.com/Interview/Shopify-Interview-Questions-E675933.htm (HTTP 403); https://www.interviewquery.com/interview-guides/shopify (HTTP 429)
+- Evidence decision → found: true (usable sources: 1)
 - Detected signals: take-home=false, system-design=false, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 30 questions (technical: 18, behavioural: 4, company-fit: 8)
+- 23 questions (technical: 9, behavioural: 4, company-fit: 10)
 
 ## Coverage
 
@@ -181,36 +181,36 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 3+ years of backend development experience | must | q1, q23 |
-| r2: Strong Ruby, Node.js, or similar backend experience | must | q1, q2, q23, q24 |
-| r3: Experience building REST APIs | must | q3, q4, q24 |
-| r4: Strong SQL and relational database knowledge | must | q5, q6, q25 |
-| r5: Experience with distributed systems | must | q7, q8, q26 |
-| r6: Experience working with high-traffic applications | must | q9, q10, q26 |
-| r7: Strong problem-solving skills | must | q19, q20, q27 |
-| r8: Ability to work effectively with product and engineering teams | must | q21, q22, q28 |
-| r9: E-commerce experience | nice | q11, q12, q29 |
-| r10: Experience with GraphQL | nice | q13, q14, q29 |
-| r11: Experience with Kubernetes | nice | q15, q16, q30 |
-| r12: Experience with event-driven architecture | nice | q17, q18, q30 |
+| r1: 3+ years of backend development experience | must | q1, q2, q14, q23 |
+| r2: Strong Ruby, Node.js, or similar backend experience | must | q1, q14, q23 |
+| r3: Experience building REST APIs | must | q2, q15, q23 |
+| r4: Strong SQL and relational database knowledge | must | q3, q15, q23 |
+| r5: Experience with distributed systems | must | q4, q16, q23 |
+| r6: Experience working with high-traffic applications | must | q5, q16, q23 |
+| r7: Strong problem-solving skills | must | q10, q11, q17 |
+| r8: Ability to work effectively with product and engineering teams | must | q12, q13, q18 |
+| r9: E-commerce experience | nice | q6, q19 |
+| r10: Experience with GraphQL | nice | q7, q20 |
+| r11: Experience with Kubernetes | nice | q8, q21 |
+| r12: Experience with event-driven architecture | nice | q9, q22 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical & Behavioural | 6 | 360 |
-| 2 | Technical & Company fit | 6 | 280 |
-| 3 | Technical & Behavioural | 6 | 240 |
-| 4 | Technical & Company fit | 6 | 320 |
-| 5 | Technical & Company fit | 6 | 220 |
+| 1 | Technical & Behavioural | 5 | 300 |
+| 2 | Technical & Company fit | 5 | 220 |
+| 3 | Company fit & Behavioural | 4 | 160 |
+| 4 | Technical & Company fit | 5 | 240 |
+| 5 | Company fit & Technical | 4 | 160 |
 
 ## Final checks
 
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 12 (must 8, nice 4)
-- Questions: 30 · Flashcards: 12
-- Schedule: 5 days, 30 question slots
+- Questions: 23 · Flashcards: 12
+- Schedule: 5 days, 23 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
@@ -229,9 +229,9 @@ OK
 
 ## Timing
 
-- Total: 32467 ms
-- LLM calls: 6 (24512 ms, model deepseek-chat)
-- Stages: extracting(1198ms) → crawling(4833ms) → interview-research(3120ms) → generating(23315ms) → covering(0ms) → scheduling(0ms) → validating(0ms) → done(0ms)
+- Total: 56319 ms
+- LLM calls: 8 (35420 ms, model deepseek-chat)
+- Stages: extracting(1483ms) → crawling(8794ms) → interview-research(12663ms) → generating(33379ms) → covering(0ms) → scheduling(0ms) → validating(0ms) → done(0ms)
 
 ## Requirements
 
@@ -258,26 +258,26 @@ OK
 
 ## Interview research
 
-- Found: false
-- Signals: take-home=false, system-design=false, behavioural=false
-- Summary: No public information about the interview process was found.
-- Sources: (none)
+- Found: true
+- Signals: take-home=false, system-design=true, behavioural=false
+- Summary: Public discussion suggests the interview process includes a system design round.
+- Sources: https://www.linear.eu/en/home/
 
 _Diagnostics:_
 - Queries: "Linear interview process", "Linear engineering interview experience"
-- Returned URLs (6): https://news.ycombinator.com/item?id=33410457, https://news.ycombinator.com/item?id=964506, https://mosaic.so, https://news.ycombinator.com/item?id=45980760, https://news.ycombinator.com/item?id=21012722, https://news.ycombinator.com/item?id=17893788
-- Fetched URLs: https://mosaic.so
-- Discovered links (interview-relevant): (none)
+- Returned URLs (22): https://news.ycombinator.com/item?id=33410457, https://news.ycombinator.com/item?id=964506, https://mosaic.so, https://news.ycombinator.com/item?id=45980760, https://news.ycombinator.com/item?id=21012722, https://news.ycombinator.com/item?id=17893788, https://linear.app/, https://linear.app/download, https://www.linear.eu/en/home/, https://github.com/linear, https://www.linkedin.com/company/linearapp, https://www.youtube.com/@linear, https://www.techinterview.org/companies/linear/, https://techscreen.app/articles/linear-technical-interview-process-2026, https://claveprep.com/blog/linear-hiring-process-guide-2026, https://claveprep.com/blog/linear-interview-preparation-guide-2026, https://knok.work/blog/how-to-get-hired-at-linear.html, https://www.designgurus.io/answers/detail/what-is-the-linear-interview-process-like-round-by-round, https://www.glassdoor.com/Interview/Linear-Technology-Interview-Questions-E1598.htm, https://www.indeed.com/cmp/Linear-Engineering/interviews, https://www.glassdoor.com/Interview/Linear-B-Interview-Questions-E3047845.htm, https://codeswiftr.com/blog/linear-engineering-interview-guide
+- Fetched URLs: https://mosaic.so, https://linear.app/, https://linear.app/download, https://www.linear.eu/en/home/, https://github.com/linear, https://www.linkedin.com/company/linearapp, https://www.youtube.com/@linear
+- Discovered links (interview-relevant): https://linear.app/changelog/2026-09-14-loops-for-product-management, https://linear.app/changelog/2026-08-20-coding-environments, https://linear.app/changelog/2026-08-13-team-initiatives, https://linear.app/customers/openai, https://linear.app/customers/ramp, https://apps.apple.com/app/linear-mobile/id1645587184, https://linear.app/careers, https://x.com/linear, https://github.com/orgs/linear/followers, https://github.com/orgs/linear/repositories, https://github.com/orgs/linear/projects, https://github.com/orgs/linear/packages, https://github.com/orgs/linear/people, https://www.linkedin.com/redir/redirect?url=https%3A%2F%2Flinear%2Eapp&urlhash=zws5&trk=about_website, https://www.linkedin.com/posts/linearapp_new-linear-inbox-is-now-available-via-mcp-activity-7508197265501634560-O0dg, https://www.linkedin.com/company/linearapp?trk=organization_guest_main-feed-card_feed-actor-image, https://www.linkedin.com/company/linearapp?trk=organization_guest_main-feed-card_feed-actor-name, https://www.linkedin.com/posts/linearapp_agents-were-shipping-code-faster-than-our-activity-7507865131066744833-FjHm
 - Followed links (traversed deeper): (none)
-- Evidence sources (company-specific interview evidence): (none)
-- Rejected: https://news.ycombinator.com/item?id=33410457 (fetch failed); https://news.ycombinator.com/item?id=964506 (fetch failed); https://mosaic.so (no interview-process evidence); https://news.ycombinator.com/item?id=45980760 (fetch failed); https://news.ycombinator.com/item?id=21012722 (fetch failed); https://news.ycombinator.com/item?id=17893788 (fetch failed)
-- Evidence decision → found: false (usable sources: 0)
-- Detected signals: take-home=false, system-design=false, behavioural=false
+- Evidence sources (company-specific interview evidence): https://www.linear.eu/en/home/
+- Rejected: https://news.ycombinator.com/item?id=33410457 (fetch failed); https://news.ycombinator.com/item?id=964506 (fetch failed); https://mosaic.so (no interview-process evidence); https://news.ycombinator.com/item?id=45980760 (fetch failed); https://news.ycombinator.com/item?id=21012722 (fetch failed); https://news.ycombinator.com/item?id=17893788 (fetch failed); https://linear.app/ (mentions the company but describes no interview process); https://linear.app/download (mentions the company but describes no interview process); https://github.com/linear (mentions the company but describes no interview process); https://www.linkedin.com/company/linearapp (mentions the company but describes no interview process); https://www.youtube.com/@linear (mentions the company but describes no interview process)
+- Evidence decision → found: true (usable sources: 1)
+- Detected signals: take-home=false, system-design=true, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 26 questions (technical: 15, behavioural: 2, company-fit: 9)
+- 33 questions (technical: 22, behavioural: 2, system-design: 2, company-fit: 7)
 
 ## Coverage
 
@@ -289,34 +289,34 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 4+ years of software engineering experience | must | q1, q2, q18 |
-| r2: Strong TypeScript and React experience | must | q3, q4, q19 |
-| r3: Strong backend development experience | must | q5, q6, q20 |
-| r4: Experience designing APIs | must | q7, q8, q20 |
-| r5: Experience with PostgreSQL | must | q6, q9, q21 |
-| r6: Experience building polished user-facing products | must | q4, q10, q19 |
-| r7: Strong understanding of software architecture | must | q2, q11, q22 |
-| r8: Strong communication and collaboration skills | must | q16, q17, q23 |
-| r9: Experience with AI-powered products | nice | q12, q24 |
-| r10: Experience with GraphQL | nice | q8, q13, q25 |
-| r11: Experience with real-time systems | nice | q14, q26 |
-| r12: Experience at a fast-growing startup | nice | q15, q18 |
+| r1: 4+ years of software engineering experience | must | q1, q2, q27 |
+| r2: Strong TypeScript and React experience | must | q3, q4, q28 |
+| r3: Strong backend development experience | must | q5, q6, q25, q26, q29 |
+| r4: Experience designing APIs | must | q7, q8, q25, q26, q29 |
+| r5: Experience with PostgreSQL | must | q9, q10, q25, q26, q30 |
+| r6: Experience building polished user-facing products | must | q11, q12, q28 |
+| r7: Strong understanding of software architecture | must | q13, q14, q25, q26, q31 |
+| r8: Strong communication and collaboration skills | must | q23, q24, q32 |
+| r9: Experience with AI-powered products | nice | q15, q16, q33 |
+| r10: Experience with GraphQL | nice | q17, q18, q33 |
+| r11: Experience with real-time systems | nice | q19, q20, q26, q33 |
+| r12: Experience at a fast-growing startup | nice | q21, q22, q27 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical & Company fit | 9 | 520 |
-| 2 | Technical & Company fit | 9 | 360 |
-| 3 | Company fit & Technical | 8 | 380 |
+| 1 | Technical & System design | 11 | 640 |
+| 2 | Technical & Company fit | 11 | 440 |
+| 3 | Technical & Company fit | 11 | 500 |
 
 ## Final checks
 
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 12 (must 8, nice 4)
-- Questions: 26 · Flashcards: 13
-- Schedule: 3 days, 26 question slots
+- Questions: 33 · Flashcards: 13
+- Schedule: 3 days, 33 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
@@ -335,9 +335,9 @@ OK
 
 ## Timing
 
-- Total: 30964 ms
-- LLM calls: 6 (25430 ms, model deepseek-chat)
-- Stages: extracting(1389ms) → crawling(1521ms) → interview-research(4010ms) → generating(24043ms) → covering(0ms) → scheduling(1ms) → validating(0ms) → done(0ms)
+- Total: 34159 ms
+- LLM calls: 6 (23634 ms, model deepseek-chat)
+- Stages: extracting(1407ms) → crawling(3558ms) → interview-research(6965ms) → generating(22228ms) → covering(0ms) → scheduling(0ms) → validating(0ms) → done(1ms)
 
 ## Requirements
 
@@ -371,19 +371,19 @@ OK
 
 _Diagnostics:_
 - Queries: "Notion interview process", "Notion engineering interview experience"
-- Returned URLs (14): https://news.ycombinator.com/item?id=35525515, https://www.getgrindstone.com/, https://news.ycombinator.com/item?id=43013378, https://briansjobsearch.com, https://news.ycombinator.com/item?id=39841766, https://news.ycombinator.com/item?id=41259754, https://news.ycombinator.com/item?id=12201685, https://news.ycombinator.com/item?id=39581833, https://www.notion.com/, https://app.notion.com/login, https://www.notion.com/desktop, https://app.notion.com/signup, https://en.wikipedia.org/wiki/Notion_(productivity_software), https://www.notion.com/explore
-- Fetched URLs: https://briansjobsearch.com, https://www.notion.com/, https://app.notion.com/login, https://www.notion.com/desktop, https://app.notion.com/signup
-- Discovered links (interview-relevant): https://www.notion.com/product/ai, https://www.notion.com/product/calendar, https://www.notion.com/download, https://www.notion.com/signup, https://www.notion.com/careers, https://www.notion.com/help/system-requirements-for-notion
+- Returned URLs (29): https://news.ycombinator.com/item?id=35525515, https://www.getgrindstone.com/, https://news.ycombinator.com/item?id=43013378, https://briansjobsearch.com, https://news.ycombinator.com/item?id=39841766, https://news.ycombinator.com/item?id=41259754, https://news.ycombinator.com/item?id=12201685, https://news.ycombinator.com/item?id=39581833, https://www.justdial.com/Mumbai/Mahanagar-Gas-Ltd-Behind-Borivali-Merto-Mall-Near-Magathana-Bus-Depot-Rajendra-Nagar-Borivali-East/022P150907_BZDET, https://www.indiainfo.net/place/mahanagar-gas-108884, https://www.helloindia.co/Mumbai/Mgl-BEST-Pump-Station/Borivali-East/ContactUs, https://www.justdial.com/Mumbai/Mahanagar-Gas-Limited/nct-16112268, https://www.dnb.com/business-directory/company-profiles/mahanagar-gas-limited.602d124923c5738d8ce6f8207ca091c7, https://moovitapp.com/index/en/public_transit-Mahanagar_Gas-Mumbai-site_83486326-3732, https://www.finalroundai.com/blog/notion-interview-process, https://www.glassdoor.com/Interview/Notion-Interview-Questions-E1530032.htm, https://www.notion.com/templates/notions-guide-for-interviewing-at-notion, https://www.teamblind.com/company/Notion/posts/notion-interview, https://jobsbyculture.com/blog/notion-interview-prep-2026, https://www.frontend-junction.com/interview-experience/notion-frontend-interview-experience-2026, https://www.google.co.in/index.html, https://translate.google.co.in/, https://www.google.co.in/intl/en_uk/chrome/, https://books.google.co.in/, https://images.google.co.in/, https://translate.google.co.in/details, https://www.glassdoor.com/Interview/Notion-Labs-Interview-Questions-E3304926.htm, https://www.linkjob.ai/interview-questions/notion-software-engineer-interview-questions/, https://wildwildtech.substack.com/p/notion-interview-experience-2025
+- Fetched URLs: https://briansjobsearch.com, https://www.justdial.com/Mumbai/Mahanagar-Gas-Ltd-Behind-Borivali-Merto-Mall-Near-Magathana-Bus-Depot-Rajendra-Nagar-Borivali-East/022P150907_BZDET, https://www.indiainfo.net/place/mahanagar-gas-108884, https://www.helloindia.co/Mumbai/Mgl-BEST-Pump-Station/Borivali-East/ContactUs, https://www.justdial.com/Mumbai/Mahanagar-Gas-Limited/nct-16112268
+- Discovered links (interview-relevant): (none)
 - Followed links (traversed deeper): (none)
 - Evidence sources (company-specific interview evidence): (none)
-- Rejected: https://news.ycombinator.com/item?id=35525515 (fetch failed); https://www.getgrindstone.com/ (HTTP 404); https://news.ycombinator.com/item?id=43013378 (fetch failed); https://briansjobsearch.com (no interview-process evidence); https://news.ycombinator.com/item?id=39841766 (fetch failed); https://news.ycombinator.com/item?id=41259754 (fetch failed); https://news.ycombinator.com/item?id=12201685 (fetch failed); https://news.ycombinator.com/item?id=39581833 (fetch failed); https://www.notion.com/ (mentions the company but describes no interview process); https://app.notion.com/login (no interview-process evidence); https://www.notion.com/desktop (mentions the company but describes no interview process); https://app.notion.com/signup (no interview-process evidence)
+- Rejected: https://news.ycombinator.com/item?id=35525515 (fetch failed); https://www.getgrindstone.com/ (HTTP 404); https://news.ycombinator.com/item?id=43013378 (fetch failed); https://briansjobsearch.com (no interview-process evidence); https://news.ycombinator.com/item?id=39841766 (fetch failed); https://news.ycombinator.com/item?id=41259754 (fetch failed); https://news.ycombinator.com/item?id=12201685 (fetch failed); https://news.ycombinator.com/item?id=39581833 (fetch failed); https://www.justdial.com/Mumbai/Mahanagar-Gas-Ltd-Behind-Borivali-Merto-Mall-Near-Magathana-Bus-Depot-Rajendra-Nagar-Borivali-East/022P150907_BZDET (no interview-process evidence); https://www.indiainfo.net/place/mahanagar-gas-108884 (no interview-process evidence); https://www.helloindia.co/Mumbai/Mgl-BEST-Pump-Station/Borivali-East/ContactUs (no interview-process evidence); https://www.justdial.com/Mumbai/Mahanagar-Gas-Limited/nct-16112268 (no interview-process evidence)
 - Evidence decision → found: false (usable sources: 0)
 - Detected signals: take-home=false, system-design=false, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 27 questions (technical: 16, behavioural: 4, company-fit: 7)
+- 30 questions (technical: 18, behavioural: 4, company-fit: 8)
 
 ## Coverage
 
@@ -395,35 +395,35 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 3+ years of software engineering experience | must | q21 |
-| r2: Strong TypeScript experience | must | q1, q2, q21 |
-| r3: Experience building AI-powered applications | must | q3, q4, q22 |
-| r4: Experience with APIs and distributed services | must | q5, q6, q23 |
-| r5: Experience working with databases | must | q7, q8, q23 |
-| r6: Strong debugging and problem-solving skills | must | q9, q10, q24 |
-| r7: Ability to work cross-functionally | must | q17, q18, q25 |
-| r8: Strong written and verbal communication | must | q19, q20, q25 |
-| r9: Experience with LLM applications | nice | q3, q4, q22 |
-| r10: Experience with RAG systems | nice | q11, q12, q26 |
-| r11: Experience with agentic systems | nice | q13, q14, q26 |
-| r12: Experience with React | nice | q15, q16, q27 |
+| r1: 3+ years of software engineering experience | must | q1, q2, q23 |
+| r2: Strong TypeScript experience | must | q3, q4, q24 |
+| r3: Experience building AI-powered applications | must | q5, q6, q23, q24 |
+| r4: Experience with APIs and distributed services | must | q7, q8, q25 |
+| r5: Experience working with databases | must | q9, q10, q25 |
+| r6: Strong debugging and problem-solving skills | must | q2, q11, q26 |
+| r7: Ability to work cross-functionally | must | q19, q20, q27 |
+| r8: Strong written and verbal communication | must | q21, q22, q27 |
+| r9: Experience with LLM applications | nice | q6, q12, q28 |
+| r10: Experience with RAG systems | nice | q13, q14, q28 |
+| r11: Experience with agentic systems | nice | q15, q16, q29 |
+| r12: Experience with React | nice | q17, q18, q30 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical & Company fit | 7 | 420 |
-| 2 | Technical & Behavioural | 7 | 280 |
-| 3 | Technical & Company fit | 7 | 240 |
-| 4 | Technical & Company fit | 6 | 220 |
+| 1 | Technical & Behavioural | 8 | 480 |
+| 2 | Technical & Company fit | 7 | 340 |
+| 3 | Technical & Behavioural | 8 | 380 |
+| 4 | Technical & Company fit | 7 | 340 |
 
 ## Final checks
 
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 12 (must 8, nice 4)
-- Questions: 27 · Flashcards: 12
-- Schedule: 4 days, 27 question slots
+- Questions: 30 · Flashcards: 12
+- Schedule: 4 days, 30 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
@@ -442,9 +442,9 @@ OK
 
 ## Timing
 
-- Total: 37992 ms
-- LLM calls: 6 (25163 ms, model deepseek-chat)
-- Stages: extracting(1447ms) → crawling(5935ms) → interview-research(6892ms) → generating(23717ms) → covering(0ms) → scheduling(1ms) → validating(0ms) → done(0ms)
+- Total: 40849 ms
+- LLM calls: 8 (25576 ms, model deepseek-chat)
+- Stages: extracting(1183ms) → crawling(7002ms) → interview-research(9253ms) → generating(23410ms) → covering(0ms) → scheduling(1ms) → validating(0ms) → done(0ms)
 
 ## Requirements
 
@@ -471,26 +471,26 @@ OK
 
 ## Interview research
 
-- Found: false
-- Signals: take-home=false, system-design=false, behavioural=false
-- Summary: No public information about the interview process was found.
-- Sources: (none)
+- Found: true
+- Signals: take-home=true, system-design=true, behavioural=true
+- Summary: Airbnb's interview process typically takes about 4 weeks and begins with a 30-45 minute recruiter phone screen, followed by a role-dependent technical assessment or hiring manager screen, and ends with a final round of multiple interviews over a whole day. The process is consistent across roles, with variations mainly in the technical assessment stage, and includes behavioral evaluation of cultural fit throughout.
+- Sources: https://www.tryexponent.com/blog/airbnb-interview-process
 
 _Diagnostics:_
 - Queries: "Airbnb interview process", "Airbnb engineering interview experience"
-- Returned URLs (11): http://redbluemagenta.com/2012/08/15/review-of-airbnbs-interview-process/, https://news.ycombinator.com/item?id=4390322, https://news.ycombinator.com/item?id=14615934, https://news.ycombinator.com/item?id=15029096, https://news.ycombinator.com/item?id=16877457, https://www.airbnb.com/, https://www.airbnb.co.in/, https://www.airbnb.com/login, https://www.airbnb.co.in/india/stays, https://en.wikipedia.org/wiki/Airbnb, https://www.airbnb.fr/
-- Fetched URLs: https://www.airbnb.com/, https://www.airbnb.co.in/, https://www.airbnb.com/login, https://www.airbnb.co.in/india/stays, https://en.wikipedia.org/wiki/Airbnb, https://www.airbnb.fr/, https://www.airbnb.co.in/host/homes
-- Discovered links (interview-relevant): https://www.airbnb.co.in/host/homes, https://www.facebook.com/airbnb, https://twitter.com/airbnb, https://instagram.com/airbnb/, https://af.wikipedia.org/wiki/Airbnb, https://als.wikipedia.org/wiki/Airbnb, https://ast.wikipedia.org/wiki/Airbnb, https://az.wikipedia.org/wiki/Airbnb, https://bcl.wikipedia.org/wiki/Airbnb, https://www.airbnb.co.in/external_link?url=https%3A%2F%2Fairbnb.sng.link%2FA6f9up%2Fmpl1%2Fez71, https://www.airbnb.co.in/resources/hosting-homes/a/is-my-place-right-for-airbnb-4, https://www.airbnb.co.in/resources/hosting-homes/a/how-to-get-started-on-airbnb-3, https://www.airbnb.co.in/resources/hosting-homes/a/how-airbnb-protects-hosts-5, https://www.airbnb.co.in/resources/hosting-homes/a/how-much-does-airbnb-charge-hosts-288
-- Followed links (traversed deeper): https://www.airbnb.co.in/host/homes
-- Evidence sources (company-specific interview evidence): (none)
-- Rejected: http://redbluemagenta.com/2012/08/15/review-of-airbnbs-interview-process/ (HTTP 404); https://news.ycombinator.com/item?id=4390322 (fetch failed); https://news.ycombinator.com/item?id=14615934 (fetch failed); https://news.ycombinator.com/item?id=15029096 (fetch failed); https://news.ycombinator.com/item?id=16877457 (fetch failed); https://www.airbnb.com/ (no interview-process evidence); https://www.airbnb.co.in/ (mentions the company but describes no interview process); https://www.airbnb.com/login (no interview-process evidence); https://www.airbnb.co.in/india/stays (mentions the company but describes no interview process); https://en.wikipedia.org/wiki/Airbnb (mentions the company but describes no interview process); https://www.airbnb.fr/ (mentions the company but describes no interview process); https://www.airbnb.co.in/host/homes (mentions the company but describes no interview process)
-- Evidence decision → found: false (usable sources: 0)
-- Detected signals: take-home=false, system-design=false, behavioural=false
+- Returned URLs (22): http://redbluemagenta.com/2012/08/15/review-of-airbnbs-interview-process/, https://news.ycombinator.com/item?id=4390322, https://news.ycombinator.com/item?id=14615934, https://news.ycombinator.com/item?id=15029096, https://news.ycombinator.com/item?id=16877457, https://www.airbnb.com/, https://www.airbnb.co.in/, https://www.airbnb.co.in/india/stays, https://www.airbnb.ca/login, https://hi.airbnb.co.in/, https://www.airbnb.com/india/stays, https://www.tryexponent.com/blog/airbnb-interview-process, https://www.interviewquery.com/interview-guides/airbnb, https://www.educative.io/blog/airbnb-interview-process-and-questions, https://www.glassdoor.com/Interview/Airbnb-Interview-Questions-E391850.htm, https://4dayweek.io/interview-process/airbnb, https://careerdevelopment.morehouse.edu/blog/2023/04/24/a-deep-dive-into-the-airbnb-interview-process/, https://www.glassdoor.com/Interview/Airbnb-Software-Engineer-Interview-Questions-EI_IE391850.0,6_KO7,24.htm, https://prachub.com/interview-experiences/airbnb-data-engineer-interview-experience-four-round-onsite-then-a-recruiter-who-ghosted-me, https://www.glassdoor.co.in/Interview/Airbnb-Interview-Questions-E391850.htm, https://medium.com/@chauhan27.abhay/airbnb-frontend-interview-experience-sde-1-a-deep-dive-into-ui-js-real-world-thinking-ef069f5ec612, https://www.hellointerview.com/guides/airbnb/g9
+- Fetched URLs: https://www.airbnb.com/, https://www.airbnb.co.in/, https://www.airbnb.co.in/india/stays, https://www.airbnb.ca/login, https://hi.airbnb.co.in/, https://www.airbnb.com/india/stays, https://www.tryexponent.com/blog/airbnb-interview-process
+- Discovered links (interview-relevant): https://www.airbnb.co.in/host/homes, https://www.facebook.com/airbnb, https://twitter.com/airbnb, https://instagram.com/airbnb/, https://www.airbnb.ca/host/homes?from_footer=1, https://www.airbnb.ca/host/experiences, https://www.airbnb.ca/host/services, https://www.airbnb.ca/careers, https://www.airbnb.org/?locale=en-CA
+- Followed links (traversed deeper): (none)
+- Evidence sources (company-specific interview evidence): https://www.tryexponent.com/blog/airbnb-interview-process
+- Rejected: http://redbluemagenta.com/2012/08/15/review-of-airbnbs-interview-process/ (HTTP 404); https://news.ycombinator.com/item?id=4390322 (fetch failed); https://news.ycombinator.com/item?id=14615934 (fetch failed); https://news.ycombinator.com/item?id=15029096 (fetch failed); https://news.ycombinator.com/item?id=16877457 (fetch failed); https://www.airbnb.com/ (no interview-process evidence); https://www.airbnb.co.in/ (mentions the company but describes no interview process); https://www.airbnb.co.in/india/stays (mentions the company but describes no interview process); https://www.airbnb.ca/login (mentions the company but describes no interview process); https://hi.airbnb.co.in/ (mentions the company but describes no interview process); https://www.airbnb.com/india/stays (no interview-process evidence)
+- Evidence decision → found: true (usable sources: 1)
+- Detected signals: take-home=true, system-design=true, behavioural=true
 - Search error: (none)
 
 ## Initial question generation
 
-- 18 questions (technical: 8, behavioural: 2, company-fit: 8)
+- 26 questions (technical: 12, behavioural: 2, system-design: 6, company-fit: 6)
 
 ## Coverage
 
@@ -502,38 +502,38 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 4+ years of backend engineering experience | must | q8, q11 |
-| r2: Experience with Java, Python, Go, or Node.js | must | q1, q2, q12 |
-| r3: Experience building scalable distributed systems | must | q3, q4, q11 |
-| r4: Strong SQL and database fundamentals | must | q1, q8, q13 |
-| r5: Experience designing APIs | must | q5, q6, q12 |
-| r6: Experience with caching and asynchronous processing | must | q3, q6, q14 |
-| r7: Strong testing and debugging skills | must | q2, q5, q15 |
-| r8: Strong communication skills | must | q9, q10, q16 |
-| r9: Marketplace experience | nice | q7, q17 |
-| r10: Experience with recommendation systems | nice | q7, q17 |
-| r11: Experience with high-scale consumer applications | nice | q18 |
-| r12: Experience with Kubernetes | nice | q4, q18 |
+| r1: 4+ years of backend engineering experience | must | q1, q21 |
+| r2: Experience with Java, Python, Go, or Node.js | must | q2, q20, q22 |
+| r3: Experience building scalable distributed systems | must | q1, q15, q17, q21 |
+| r4: Strong SQL and database fundamentals | must | q3, q4, q15, q20, q22 |
+| r5: Experience designing APIs | must | q5, q16, q22 |
+| r6: Experience with caching and asynchronous processing | must | q6, q7, q16, q23 |
+| r7: Strong testing and debugging skills | must | q8, q17, q23 |
+| r8: Strong communication skills | must | q13, q14, q24 |
+| r9: Marketplace experience | nice | q9, q18, q25 |
+| r10: Experience with recommendation systems | nice | q10, q18, q25 |
+| r11: Experience with high-scale consumer applications | nice | q11, q19, q21 |
+| r12: Experience with Kubernetes | nice | q12, q19, q26 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical | 3 | 180 |
-| 2 | Technical & Behavioural | 3 | 140 |
-| 3 | Technical & Behavioural | 2 | 80 |
-| 4 | Company fit | 3 | 120 |
-| 5 | Company fit | 2 | 80 |
-| 6 | Technical & Company fit | 3 | 120 |
-| 7 | Company fit | 2 | 120 |
+| 1 | Technical | 4 | 240 |
+| 2 | System design & Behavioural | 4 | 240 |
+| 3 | Technical | 4 | 160 |
+| 4 | System design & Behavioural | 3 | 120 |
+| 5 | Company fit & Technical | 4 | 160 |
+| 6 | Technical & System design | 4 | 220 |
+| 7 | Technical & System design | 3 | 120 |
 
 ## Final checks
 
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 12 (must 8, nice 4)
-- Questions: 18 · Flashcards: 12
-- Schedule: 7 days, 18 question slots
+- Questions: 26 · Flashcards: 12
+- Schedule: 7 days, 26 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
