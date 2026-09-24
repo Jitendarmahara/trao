@@ -23,7 +23,7 @@ const SAMPLE_DDG_HTML = `
 const DDG_CHALLENGE = '<html><body>If this error persists, please let us know. anomaly detected</body></html>';
 
 const DISCUSSION =
-  '<title>My Acme interview</title><body>I did a take-home exercise, then a system design round, and finally some behavioural questions about teamwork.</body>';
+  '<title>Acme interview</title><body>My Acme interview: a take-home exercise, then a system design round, and finally some behavioural questions about teamwork.</body>';
 
 function fakePages(pages: Record<string, string>): FetchFn {
   return async (url) =>
@@ -162,10 +162,36 @@ describe('researchInterviewProcess', () => {
     expect(research.found).toBe(true);
     expect(diag?.search_results_returned).toBe(2);
     expect(diag?.usable_search_results).toBe(1);
-    expect(diag?.fetched_sources).toEqual(['https://blog.test/exp']);
+    expect(diag?.evidence_sources).toEqual(['https://blog.test/exp']);
     expect(diag?.rejected_sources.some((r) => r.url === 'https://blocked.test/exp' && /403/.test(r.reason))).toBe(true);
     expect(diag?.search_error).toBeNull();
     expect(diag?.signals_detected.hasSystemDesign).toBe(true);
+  });
+
+  it('rejects a fetched page that mentions the company but has no interview process', async () => {
+    const provider = new StaticSearchProvider([{ url: 'https://acme.test/', title: 'home' }]);
+    const homepage = '<title>Acme</title><body>Acme builds payment APIs for developers worldwide.</body>';
+    let diag: InterviewResearchDiagnostics | undefined;
+    const research = await researchInterviewProcess(
+      { name: 'Acme' },
+      { searchProvider: provider, fetchFn: fakePages({ 'https://acme.test/': homepage }), onDiagnostics: (d) => (diag = d) },
+    );
+    expect(research.found).toBe(false);
+    expect(diag?.fetched_urls).toEqual(['https://acme.test/']); // it WAS fetched
+    expect(diag?.evidence_sources).toEqual([]); // but not accepted as evidence
+    expect(diag?.rejected_sources[0].reason).toMatch(/no interview process/i);
+  });
+
+  it('rejects interview-process content that is not specific to the company', async () => {
+    const provider = new StaticSearchProvider([{ url: 'https://guide.test/sd', title: 'guide' }]);
+    const guide = '<title>Guide</title><body>A generic system design interview guide with take-home tips and coding rounds.</body>';
+    let diag: InterviewResearchDiagnostics | undefined;
+    const research = await researchInterviewProcess(
+      { name: 'Acme' }, // guide never mentions Acme
+      { searchProvider: provider, fetchFn: fakePages({ 'https://guide.test/sd': guide }), onDiagnostics: (d) => (diag = d) },
+    );
+    expect(research.found).toBe(false);
+    expect(diag?.rejected_sources[0].reason).toMatch(/not specific to this company/i);
   });
 
   it('records search_error when the search backend is blocked/unavailable', async () => {
@@ -183,16 +209,14 @@ describe('researchInterviewProcess', () => {
     expect(diag?.search_error).toMatch(/challenge|anomaly/i);
   });
 
-  it('does not invent signals when the discussion is unrelated', async () => {
+  it('does not mark found=true for an unrelated page with no interview process', async () => {
     const provider = new StaticSearchProvider([{ url: 'https://blog.test/chat', title: 'chat' }]);
     const bland = '<title>Chat</title><body>I had a friendly conversation about my background at Acme.</body>';
     const research = await researchInterviewProcess(
       { name: 'Acme' },
       { searchProvider: provider, fetchFn: fakePages({ 'https://blog.test/chat': bland }) },
     );
-    expect(research.found).toBe(true);
-    expect(research.hasTakeHome).toBe(false);
+    expect(research.found).toBe(false); // fetched, mentions Acme, but no interview-process evidence
     expect(research.hasSystemDesign).toBe(false);
-    expect(research.behaviouralEmphasis).toBe(false);
   });
 });

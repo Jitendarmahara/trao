@@ -22,9 +22,14 @@ export interface SearchResult {
 /** Safe, secret-free observability for the interview-research stage. */
 export interface InterviewResearchDiagnostics {
   queries_attempted: string[];
+  /** Every URL the search returned. */
+  returned_urls: string[];
   search_results_returned: number;
+  /** URLs that fetched successfully (any content). */
+  fetched_urls: string[];
+  /** Fetched URLs that passed the company-specific interview-evidence gate. */
+  evidence_sources: string[];
   usable_search_results: number;
-  fetched_sources: string[];
   rejected_sources: { url: string; reason: string }[];
   signals_detected: { hasTakeHome: boolean; hasSystemDesign: boolean; behaviouralEmphasis: boolean };
   final_found: boolean;

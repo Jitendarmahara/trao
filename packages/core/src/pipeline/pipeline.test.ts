@@ -46,7 +46,7 @@ const CANNED = [
 const HOMEPAGE = `<title>Acme</title><h1>Acme builds payment APIs</h1>
   <a href="/about">About</a><a href="/company/join">Join the team</a>`;
 const DISCUSSION =
-  '<title>Acme interview</title><body>Take-home exercise, then a system design round, plus behavioural questions.</body>';
+  '<title>Acme interview</title><body>My Acme interview process: a take-home exercise, then a system design round, plus behavioural questions.</body>';
 
 function site(overrides: Record<string, { status?: number; body?: string; contentType?: string }> = {}): FetchFn {
   const base: Record<string, { status?: number; body?: string; contentType?: string }> = {

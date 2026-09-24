@@ -3,18 +3,20 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { createLlmClient, runPipeline, StaticSearchProvider } from '@interview-prep-kit/core';
 
 /**
- * Proof that DISCOVERED interview findings change the generated question mix.
+ * CAUSAL PIPELINE TEST (not a test of live discovery).
  *
- * The JD is technical-only (no behavioural requirements), so the `behavioural`
- * and `system-design` categories can ONLY come from interview research. We run the
- * exact production runPipeline() twice — identical JD + company — differing only in
- * whether interview research is available.
+ * Proves that interview-research findings, once present, change the generated
+ * question mix. The JD is technical-only (no behavioural requirements), so the
+ * `behavioural` / `system-design` categories can ONLY come from interview
+ * research. We run the exact production runPipeline() twice — identical JD +
+ * company — differing ONLY in whether interview research is available.
  *
- * The "with" run pins one REAL, publicly discoverable interview-discussion page and
- * fetches it LIVE (nothing fabricated); the "without" run has no search provider.
- * (Live search DISCOVERY is exercised in `npm run evaluate:real`; here we pin a
- * real URL so the causal A/B is reproducible rather than at the mercy of a flaky
- * shared-IP search environment.)
+ * The "with" run pins ONE real, company-specific interview write-up and fetches it
+ * LIVE; it passes the same company-specific evidence gate the real pipeline uses
+ * (nothing fabricated). This isolates the causal variable; it does NOT claim the
+ * page was found by live search. Live DISCOVERY is exercised by `npm run
+ * evaluate:real`, whose honest result in this runtime is that discussion hosts are
+ * mostly blocked.
  */
 const JD = `Backend Engineer
 Requirements:
@@ -24,7 +26,10 @@ Requirements:
 - Experience designing distributed systems
 - Experience building REST APIs`;
 
-const REAL_URL = 'https://www.tryexponent.com/blog/system-design-interview-guide';
+// A real, fetchable, COMPANY-SPECIFIC interview write-up (mentions Spotify + a
+// behavioural interview signal) — passes the same evidence gate as production.
+const COMPANY = 'Spotify';
+const REAL_URL = 'https://blog.rampatra.com/spotify-interview-backend-engineer-ii';
 
 async function runOnce(
   llm: ReturnType<typeof createLlmClient>,
@@ -33,7 +38,7 @@ async function runOnce(
 ): Promise<Record<string, unknown>> {
   let interview: unknown;
   const { kit } = await runPipeline(
-    { jd: JD, companyUrl: 'https://example.com', companyName: 'Example', days: 5 },
+    { jd: JD, companyUrl: 'https://example.com', companyName: COMPANY, days: 5 },
     {
       llm,
       searchProvider: provider,
@@ -62,7 +67,7 @@ async function main(): Promise<void> {
   const withoutResearch = await runOnce(llm, 'without_interview_research', undefined);
 
   const out = {
-    note: 'Same technical-only JD + company; only difference is discovered interview research (a real page fetched live). Categories present only WITH research prove the findings change the question mix.',
+    note: 'CAUSAL PIPELINE TEST (not live discovery). Same technical-only JD + company; the only difference is whether interview research is present. The pinned source is a real, company-specific interview write-up fetched live that passes the production evidence gate. Categories present only WITH research show the findings change the question mix.',
     real_source: REAL_URL,
     with_research: withResearch,
     without_research: withoutResearch,

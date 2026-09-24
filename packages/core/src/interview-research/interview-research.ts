@@ -39,6 +39,42 @@ function detectSignals(text: string): {
   };
 }
 
+/** Concrete interview-process phrases — a homepage/Wikipedia/unrelated page lacks these. */
+const PROCESS_SIGNALS: RegExp[] = [
+  /take[-\s]?home/,
+  /system[-\s]?design/,
+  /on-?site interview|onsite/,
+  /phone screen/,
+  /coding (interview|round|challenge|exercise)/,
+  /technical screen/,
+  /recruiter screen/,
+  /behaviou?ral (interview|round|question)/,
+  /interview (process|rounds?|loop|stages?|questions?|experience)/,
+  /rounds? of interview/,
+  /hiring process/,
+  /whiteboard/,
+  /pair[- ]programming interview/,
+];
+
+/**
+ * Deterministically decide whether a fetched page is real, COMPANY-SPECIFIC
+ * interview-process evidence: it must both mention the company AND contain at
+ * least one concrete interview-process phrase. This rejects generic company
+ * homepages, Wikipedia and unrelated articles (which mention the company but
+ * describe no interview process) and generic guides (which describe a process
+ * but not this company).
+ */
+export function interviewEvidence(
+  text: string,
+  companyName: string,
+): { hasEvidence: boolean; mentionsCompany: boolean; processHits: number } {
+  const t = text.toLowerCase();
+  const processHits = PROCESS_SIGNALS.reduce((n, re) => n + (re.test(t) ? 1 : 0), 0);
+  const name = companyName.trim().toLowerCase();
+  const mentionsCompany = name.length > 0 && t.includes(name);
+  return { hasEvidence: processHits >= 1 && mentionsCompany, mentionsCompany, processHits };
+}
+
 function noInfo(sources: string[] = []): InterviewResearch {
   return {
     found: false,
@@ -69,9 +105,11 @@ export async function researchInterviewProcess(
 
   const diag: InterviewResearchDiagnostics = {
     queries_attempted: [],
+    returned_urls: [],
     search_results_returned: 0,
+    fetched_urls: [],
+    evidence_sources: [],
     usable_search_results: 0,
-    fetched_sources: [],
     rejected_sources: [],
     signals_detected: { hasTakeHome: false, hasSystemDesign: false, behaviouralEmphasis: false },
     final_found: false,
@@ -104,6 +142,7 @@ export async function researchInterviewProcess(
     diag.search_error = err instanceof Error ? err.message : String(err);
     return done(noInfo());
   }
+  diag.returned_urls = results.map((r) => r.url);
   diag.search_results_returned = results.length;
   if (results.length === 0) return done(noInfo());
 
@@ -121,17 +160,28 @@ export async function researchInterviewProcess(
       diag.rejected_sources.push({ url: result.url, reason: fetched.reason });
       continue;
     }
+    diag.fetched_urls.push(result.url);
     const page = extractPage(result.url, fetched.body);
-    if (page.text.length < 40) {
-      diag.rejected_sources.push({ url: result.url, reason: 'page text too short' });
+
+    // Gate: the page must be real, company-specific interview-process evidence —
+    // not a homepage / Wikipedia / unrelated article that merely fetched.
+    const evidence = interviewEvidence(page.text, company.name);
+    if (!evidence.hasEvidence) {
+      const reason = !evidence.mentionsCompany
+        ? evidence.processHits > 0
+          ? 'interview-process content, but not specific to this company'
+          : 'no interview-process evidence'
+        : 'mentions the company but describes no interview process';
+      diag.rejected_sources.push({ url: result.url, reason });
       continue;
     }
+
     texts.push(page.text);
     sources.push(result.url);
   }
-  diag.usable_search_results = texts.length;
-  diag.fetched_sources = sources;
-  if (texts.length === 0) return done(noInfo(sources));
+  diag.evidence_sources = sources;
+  diag.usable_search_results = sources.length;
+  if (texts.length === 0) return done(noInfo());
 
   const combined = texts.join('\n\n').slice(0, 6_000);
   const signals = detectSignals(combined);
