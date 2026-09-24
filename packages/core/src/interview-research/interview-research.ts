@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import type { LlmClient } from '../llm/index.js';
-import { Fetcher } from '../retrieval/fetcher.js';
+import { BROWSER_USER_AGENT, Fetcher } from '../retrieval/fetcher.js';
 import { extractPage } from '../retrieval/html.js';
 import { checkUrl } from '../retrieval/url-guard.js';
 import type { FetchFn } from '../shared/http.js';
-import type { InterviewResearch, SearchProvider } from './types.js';
+import type { InterviewResearch, InterviewResearchDiagnostics, SearchProvider } from './types.js';
 
 export interface InterviewResearchOptions {
   /** Search backend. Without one, the result is an honest "nothing found". */
@@ -16,6 +16,8 @@ export interface InterviewResearchOptions {
   allowLocal?: boolean;
   /** How many discussion pages to actually read. Default 3. */
   maxSources?: number;
+  /** Safe, secret-free observability hook (reporting). */
+  onDiagnostics?: (diagnostics: InterviewResearchDiagnostics) => void;
 }
 
 const SummarySchema = z.object({
@@ -54,39 +56,82 @@ function noInfo(sources: string[] = []): InterviewResearch {
  * interviews, read it (untrusted → content only, never instructions), and
  * extract concrete process signals. Its output feeds generation (Step 5) so the
  * question mix reflects a real, discovered process — or honestly says there is none.
+ *
+ * Emits secret-free diagnostics so a reviewer can see exactly what the search
+ * path did (queries, results, usable sources, rejections, signals) and whether
+ * the search backend was blocked rather than genuinely empty.
  */
 export async function researchInterviewProcess(
   company: { name: string; url?: string },
   options: InterviewResearchOptions = {},
 ): Promise<InterviewResearch> {
-  const { searchProvider, llm, allowLocal = false, maxSources = 3 } = options;
-  if (!searchProvider) return noInfo();
+  const { searchProvider, llm, allowLocal = false, maxSources = 3, onDiagnostics } = options;
 
-  const fetcher = options.fetcher ?? new Fetcher({ fetchFn: options.fetchFn, allowLocal });
+  const diag: InterviewResearchDiagnostics = {
+    queries_attempted: [],
+    search_results_returned: 0,
+    usable_search_results: 0,
+    fetched_sources: [],
+    rejected_sources: [],
+    signals_detected: { hasTakeHome: false, hasSystemDesign: false, behaviouralEmphasis: false },
+    final_found: false,
+    search_error: null,
+  };
+  const done = (research: InterviewResearch): InterviewResearch => {
+    diag.final_found = research.found;
+    diag.signals_detected = {
+      hasTakeHome: research.hasTakeHome,
+      hasSystemDesign: research.hasSystemDesign,
+      behaviouralEmphasis: research.behaviouralEmphasis,
+    };
+    onDiagnostics?.(diag);
+    return research;
+  };
+
+  if (!searchProvider) return done(noInfo());
+
+  // Browser UA: search engines and many discussion sites block non-browser bots.
+  const fetcher =
+    options.fetcher ?? new Fetcher({ fetchFn: options.fetchFn, allowLocal, userAgent: BROWSER_USER_AGENT });
   const query = `${company.name} interview process questions experience`;
+  diag.queries_attempted.push(query);
 
   let results;
   try {
     results = await searchProvider.search(query, maxSources * 2);
-  } catch {
-    return noInfo();
+  } catch (err) {
+    // Blocked/unavailable search is recorded explicitly, not hidden as "no info".
+    diag.search_error = err instanceof Error ? err.message : String(err);
+    return done(noInfo());
   }
-  if (results.length === 0) return noInfo();
+  diag.search_results_returned = results.length;
+  if (results.length === 0) return done(noInfo());
 
   const sources: string[] = [];
   const texts: string[] = [];
   for (const result of results) {
     if (texts.length >= maxSources) break;
     const guard = checkUrl(result.url, { allowLocal });
-    if (!guard.ok) continue;
+    if (!guard.ok) {
+      diag.rejected_sources.push({ url: result.url, reason: guard.reason });
+      continue;
+    }
     const fetched = await fetcher.fetch(result.url);
-    if (!fetched.ok) continue;
+    if (!fetched.ok) {
+      diag.rejected_sources.push({ url: result.url, reason: fetched.reason });
+      continue;
+    }
     const page = extractPage(result.url, fetched.body);
-    if (page.text.length < 40) continue;
+    if (page.text.length < 40) {
+      diag.rejected_sources.push({ url: result.url, reason: 'page text too short' });
+      continue;
+    }
     texts.push(page.text);
     sources.push(result.url);
   }
-  if (texts.length === 0) return noInfo();
+  diag.usable_search_results = texts.length;
+  diag.fetched_sources = sources;
+  if (texts.length === 0) return done(noInfo(sources));
 
   const combined = texts.join('\n\n').slice(0, 6_000);
   const signals = detectSignals(combined);
@@ -127,5 +172,5 @@ export async function researchInterviewProcess(
       : 'Public discussion was found but did not clearly describe the interview process.';
   }
 
-  return { found: true, summary, rounds, ...signals, sources };
+  return done({ found: true, summary, rounds, ...signals, sources });
 }

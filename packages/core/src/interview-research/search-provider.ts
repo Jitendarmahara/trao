@@ -1,5 +1,17 @@
 import type { SearchProvider, SearchResult } from './types.js';
 
+/**
+ * Thrown when the search backend is unavailable/blocked (e.g. a rate-limit or
+ * bot-challenge page) — distinct from a successful search that found nothing.
+ * This lets the pipeline report "search blocked" honestly instead of "no info".
+ */
+export class SearchUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SearchUnavailableError';
+  }
+}
+
 /** No search backend configured → always empty (yields an honest "nothing found"). */
 export class NullSearchProvider implements SearchProvider {
   async search(): Promise<SearchResult[]> {

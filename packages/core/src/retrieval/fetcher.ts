@@ -3,6 +3,14 @@ import { checkUrl } from './url-guard.js';
 
 export const USER_AGENT = 'InterviewPrepKitBot/0.1 (+https://interview-prep-kit.example/bot)';
 
+/**
+ * A browser-like User-Agent for talking to services (like search engines) that
+ * reject non-browser bots. Used ONLY by the research/search path, never by the
+ * company-site crawler, which keeps the honest bot UA above.
+ */
+export const BROWSER_USER_AGENT =
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
 export type FetchResult =
   | { ok: true; status: number; url: string; contentType: string; body: string }
   | { ok: false; status: number; url: string; reason: string };
@@ -16,6 +24,8 @@ export interface FetcherOptions {
   allowLocal?: boolean;
   /** Max redirect hops to follow. Default 5. */
   maxRedirects?: number;
+  /** Override the User-Agent (e.g. a browser UA for search engines). */
+  userAgent?: string;
 }
 
 const defaultFetch: FetchFn = (url, init) => fetch(url, init);
@@ -35,6 +45,7 @@ export class Fetcher {
   private readonly allowed: string[];
   private readonly allowLocal: boolean;
   private readonly maxRedirects: number;
+  private readonly userAgent: string;
 
   constructor(options: FetcherOptions = {}) {
     this.fetchFn = options.fetchFn ?? defaultFetch;
@@ -47,6 +58,7 @@ export class Fetcher {
     ];
     this.allowLocal = options.allowLocal ?? false;
     this.maxRedirects = options.maxRedirects ?? 5;
+    this.userAgent = options.userAgent ?? USER_AGENT;
   }
 
   async fetch(url: string): Promise<FetchResult> {
@@ -65,7 +77,7 @@ export class Fetcher {
           redirect: 'manual',
           signal: controller.signal,
           headers: {
-            'user-agent': USER_AGENT,
+            'user-agent': this.userAgent,
             accept: 'text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.1',
           },
         });

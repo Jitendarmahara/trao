@@ -10,6 +10,7 @@ import {
   type FetchFn,
   type Flashcard,
   type InterviewResearch,
+  type InterviewResearchDiagnostics,
   type Kit,
   type LlmClient,
   type PipelineArtifact,
@@ -67,6 +68,7 @@ export async function collectCase(c: RealCase, options: CollectOptions): Promise
   let extractionRole: ExtractedRole | undefined;
   let companyResearch: CompanyResearch | undefined;
   let interviewResearch: InterviewResearch | undefined;
+  let interviewDiagnostics: InterviewResearchDiagnostics | undefined;
   let companyBrief: CompanyBrief | undefined;
   let initial: { questions: Question[]; flashcards: Flashcard[] } | undefined;
   const passesDetail: CoveragePassInfo[] = [];
@@ -82,6 +84,9 @@ export async function collectCase(c: RealCase, options: CollectOptions): Promise
         break;
       case 'interview-research':
         interviewResearch = a.research;
+        break;
+      case 'interview-research-diagnostics':
+        interviewDiagnostics = a.diagnostics;
         break;
       case 'company-brief':
         companyBrief = a.brief;
@@ -180,6 +185,7 @@ export async function collectCase(c: RealCase, options: CollectOptions): Promise
       : null,
     retrieval,
     interview_research: interviewResearch ?? null,
+    interview_research_diagnostics: interviewDiagnostics ?? null,
     company_brief: companyBrief ?? null,
     initial_generation: initial
       ? { initial_questions: initial.questions, flashcards: initial.flashcards }

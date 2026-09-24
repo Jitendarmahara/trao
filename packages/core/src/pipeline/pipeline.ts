@@ -4,6 +4,7 @@ import { generateCompanyBrief, generateFlashcards, generateQuestions } from '../
 import {
   researchInterviewProcess,
   type InterviewResearch,
+  type InterviewResearchDiagnostics,
   type SearchProvider,
 } from '../interview-research/index.js';
 import {
@@ -46,6 +47,7 @@ export type PipelineArtifact =
   | { type: 'extraction'; role: ExtractedRole }
   | { type: 'company-research'; research: CompanyResearch }
   | { type: 'interview-research'; research: InterviewResearch }
+  | { type: 'interview-research-diagnostics'; diagnostics: InterviewResearchDiagnostics }
   | { type: 'company-brief'; brief: CompanyBrief }
   | { type: 'initial-generation'; questions: Question[]; flashcards: Flashcard[] }
   | { type: 'coverage-pass'; info: CoveragePassInfo }
@@ -163,6 +165,8 @@ export async function runPipeline(
         llm: options.llm,
         fetchFn: options.fetchFn,
         allowLocal: options.allowLocal,
+        onDiagnostics: (diagnostics) =>
+          artifact({ type: 'interview-research-diagnostics', diagnostics }),
       },
     );
   } catch {

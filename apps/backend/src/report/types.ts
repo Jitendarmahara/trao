@@ -4,6 +4,7 @@ import type {
   CoveragePassInfo,
   Flashcard,
   InterviewResearch,
+  InterviewResearchDiagnostics,
   Kit,
   Question,
   ScheduleDay,
@@ -94,6 +95,7 @@ export interface CaseReport {
   } | null;
   retrieval: RetrievalEvidence | null;
   interview_research: InterviewResearch | null;
+  interview_research_diagnostics: InterviewResearchDiagnostics | null;
   company_brief: CompanyBrief | null;
   initial_generation: { initial_questions: Question[]; flashcards: Flashcard[] } | null;
   coverage: {

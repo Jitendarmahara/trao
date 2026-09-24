@@ -66,6 +66,7 @@ function minimalFailed(id: string, message: string): CaseReport {
     extraction: null,
     retrieval: null,
     interview_research: null,
+    interview_research_diagnostics: null,
     company_brief: null,
     initial_generation: null,
     coverage: null,

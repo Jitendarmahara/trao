@@ -58,6 +58,16 @@ function renderCase(c: CaseReport): string {
   } else {
     lines.push('_No interview research._');
   }
+  if (c.interview_research_diagnostics) {
+    const d = c.interview_research_diagnostics;
+    lines.push('');
+    lines.push('_Diagnostics:_');
+    lines.push(`- Queries: ${d.queries_attempted.map((q) => `"${q}"`).join(', ')}`);
+    lines.push(`- Search results returned: ${d.search_results_returned} · usable: ${d.usable_search_results}`);
+    lines.push(`- Fetched sources: ${d.fetched_sources.join(', ') || '(none)'}`);
+    lines.push(`- Rejected: ${d.rejected_sources.map((r) => `${r.url} (${r.reason})`).join('; ') || '(none)'}`);
+    lines.push(`- Search error: ${d.search_error ?? '(none)'}`);
+  }
   lines.push('');
 
   lines.push('## Initial question generation');

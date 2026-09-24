@@ -19,6 +19,19 @@ export interface SearchResult {
   snippet?: string;
 }
 
+/** Safe, secret-free observability for the interview-research stage. */
+export interface InterviewResearchDiagnostics {
+  queries_attempted: string[];
+  search_results_returned: number;
+  usable_search_results: number;
+  fetched_sources: string[];
+  rejected_sources: { url: string; reason: string }[];
+  signals_detected: { hasTakeHome: boolean; hasSystemDesign: boolean; behaviouralEmphasis: boolean };
+  final_found: boolean;
+  /** Non-null when the search backend was blocked/unavailable (vs. genuinely empty). */
+  search_error: string | null;
+}
+
 /** Pluggable web-search backend, so the provider stays swappable and free. */
 export interface SearchProvider {
   search(query: string, limit?: number): Promise<SearchResult[]>;
