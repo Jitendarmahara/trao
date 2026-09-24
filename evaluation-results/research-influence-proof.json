@@ -1,0 +1,46 @@
+{
+  "note": "Same technical-only JD + company; only difference is discovered interview research (a real page fetched live). Categories present only WITH research prove the findings change the question mix.",
+  "real_source": "https://www.tryexponent.com/blog/system-design-interview-guide",
+  "with_research": {
+    "label": "with_interview_research",
+    "interview_research": {
+      "found": true,
+      "summary": "The text describes system design interviews as 45- to 60-minute conversations where candidates architect a software system from an open-ended prompt, with no single correct answer. It notes that the bar is higher in 2026 and that AI/LLM infrastructure prompts have moved into general engineering loops.",
+      "rounds": [
+        "system design"
+      ],
+      "hasTakeHome": false,
+      "hasSystemDesign": true,
+      "behaviouralEmphasis": true,
+      "sources": [
+        "https://www.tryexponent.com/blog/system-design-interview-guide"
+      ]
+    },
+    "categories": [
+      "technical",
+      "behavioural",
+      "system-design",
+      "company-fit"
+    ],
+    "behavioural_questions": 4,
+    "system_design_questions": 5
+  },
+  "without_research": {
+    "label": "without_interview_research",
+    "interview_research": {
+      "found": false,
+      "summary": "No public information about the interview process was found.",
+      "rounds": [],
+      "hasTakeHome": false,
+      "hasSystemDesign": false,
+      "behaviouralEmphasis": false,
+      "sources": []
+    },
+    "categories": [
+      "technical",
+      "company-fit"
+    ],
+    "behavioural_questions": 0,
+    "system_design_questions": 0
+  }
+}
