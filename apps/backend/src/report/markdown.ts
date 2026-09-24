@@ -65,6 +65,8 @@ function renderCase(c: CaseReport): string {
     lines.push(`- Queries: ${d.queries_attempted.map((q) => `"${q}"`).join(', ')}`);
     lines.push(`- Returned URLs (${d.search_results_returned}): ${d.returned_urls.join(', ') || '(none)'}`);
     lines.push(`- Fetched URLs: ${d.fetched_urls.join(', ') || '(none)'}`);
+    lines.push(`- Discovered links (interview-relevant): ${d.discovered_links.join(', ') || '(none)'}`);
+    lines.push(`- Followed links (traversed deeper): ${d.followed_links.join(', ') || '(none)'}`);
     lines.push(`- Evidence sources (company-specific interview evidence): ${d.evidence_sources.join(', ') || '(none)'}`);
     lines.push(`- Rejected: ${d.rejected_sources.map((r) => `${r.url} (${r.reason})`).join('; ') || '(none)'}`);
     lines.push(`- Evidence decision → found: ${d.final_found} (usable sources: ${d.usable_search_results})`);

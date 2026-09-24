@@ -27,6 +27,10 @@ export interface InterviewResearchDiagnostics {
   search_results_returned: number;
   /** URLs that fetched successfully (any content). */
   fetched_urls: string[];
+  /** Links discovered on fetched pages that looked interview-relevant. */
+  discovered_links: string[];
+  /** Discovered links we actually followed (bounded traversal). */
+  followed_links: string[];
   /** Fetched URLs that passed the company-specific interview-evidence gate. */
   evidence_sources: string[];
   usable_search_results: number;

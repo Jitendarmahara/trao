@@ -3,7 +3,11 @@ import type { PageLink } from './types.js';
 
 export interface ExtractedPage {
   title?: string;
+  /** Full body text (includes link anchor text). Good for LLM context. */
   text: string;
+  /** Body text with <a> anchor text removed — use for evidence/signal checks so a
+   *  page cannot look like evidence merely because it LINKS to interview content. */
+  contentText: string;
   links: PageLink[];
 }
 
@@ -22,9 +26,10 @@ export function extractPage(pageUrl: string, html: string): ExtractedPage {
 
   const title = ($('title').first().text() || $('h1').first().text()).replace(/\s+/g, ' ').trim();
 
-  const rawText = $('body').length ? $('body').text() : $.root().text();
-  const text = rawText.replace(/\s+/g, ' ').trim().slice(0, MAX_TEXT_CHARS);
+  const bodyText = (): string => ($('body').length ? $('body').text() : $.root().text());
+  const text = bodyText().replace(/\s+/g, ' ').trim().slice(0, MAX_TEXT_CHARS);
 
+  // Collect links BEFORE stripping anchors, so we still get the link list.
   const links: PageLink[] = [];
   const seen = new Set<string>();
   $('a[href]').each((_, el) => {
@@ -45,5 +50,10 @@ export function extractPage(pageUrl: string, html: string): ExtractedPage {
     links.push({ url, text: $(el).text().replace(/\s+/g, ' ').trim() });
   });
 
-  return { title: title || undefined, text, links };
+  // Content text = body text with anchor text removed (so links don't masquerade
+  // as page content when we decide whether a page is real interview evidence).
+  $('a').remove();
+  const contentText = bodyText().replace(/\s+/g, ' ').trim().slice(0, MAX_TEXT_CHARS);
+
+  return { title: title || undefined, text, contentText, links };
 }

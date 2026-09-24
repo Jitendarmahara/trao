@@ -4,7 +4,13 @@ import { BROWSER_USER_AGENT, Fetcher } from '../retrieval/fetcher.js';
 import { extractPage } from '../retrieval/html.js';
 import { checkUrl } from '../retrieval/url-guard.js';
 import type { FetchFn } from '../shared/http.js';
-import type { InterviewResearch, InterviewResearchDiagnostics, SearchProvider } from './types.js';
+import type { PageLink } from '../retrieval/index.js';
+import type {
+  InterviewResearch,
+  InterviewResearchDiagnostics,
+  SearchProvider,
+  SearchResult,
+} from './types.js';
 
 export interface InterviewResearchOptions {
   /** Search backend. Without one, the result is an honest "nothing found". */
@@ -14,8 +20,12 @@ export interface InterviewResearchOptions {
   fetcher?: Fetcher;
   fetchFn?: FetchFn;
   allowLocal?: boolean;
-  /** How many discussion pages to actually read. Default 3. */
+  /** How many evidence pages to accept. Default 3. */
   maxSources?: number;
+  /** Max link-hops to follow from a search-result page. Default 2. */
+  maxDepth?: number;
+  /** Hard cap on total page fetches (keeps the batch within its time budget). Default 12. */
+  maxFetches?: number;
   /** Safe, secret-free observability hook (reporting). */
   onDiagnostics?: (diagnostics: InterviewResearchDiagnostics) => void;
 }
@@ -75,6 +85,39 @@ export function interviewEvidence(
   return { hasEvidence: processHits >= 1 && mentionsCompany, mentionsCompany, processHits };
 }
 
+/** Deterministic ranking for whether a discovered link is worth following. */
+const LINK_SIGNALS: { kw: string; weight: number }[] = [
+  { kw: 'interview-experience', weight: 6 },
+  { kw: 'interview-process', weight: 6 },
+  { kw: 'interview experience', weight: 6 },
+  { kw: 'interview process', weight: 6 },
+  { kw: 'engineering-interview', weight: 5 },
+  { kw: 'technical-interview', weight: 5 },
+  { kw: 'interview rounds', weight: 5 },
+  { kw: 'interview questions', weight: 4 },
+  { kw: 'hiring-process', weight: 4 },
+  { kw: 'interview', weight: 4 },
+  { kw: 'candidate', weight: 3 },
+  { kw: 'hiring', weight: 3 },
+  { kw: 'recruitment', weight: 3 },
+  { kw: 'careers', weight: 2 },
+  { kw: 'next page', weight: 1 },
+];
+
+function scoreInterviewLink(link: PageLink, companyName: string): number {
+  let haystack = link.text.toLowerCase();
+  try {
+    haystack = `${new URL(link.url).pathname} ${link.text}`.toLowerCase();
+  } catch {
+    /* keep anchor text only */
+  }
+  let score = 0;
+  for (const { kw, weight } of LINK_SIGNALS) if (haystack.includes(kw)) score += weight;
+  const name = companyName.trim().toLowerCase();
+  if (name && haystack.includes(name)) score += 2; // prefer company-relevant links
+  return score;
+}
+
 function noInfo(sources: string[] = []): InterviewResearch {
   return {
     found: false,
@@ -108,6 +151,8 @@ export async function researchInterviewProcess(
     returned_urls: [],
     search_results_returned: 0,
     fetched_urls: [],
+    discovered_links: [],
+    followed_links: [],
     evidence_sources: [],
     usable_search_results: 0,
     rejected_sources: [],
@@ -131,53 +176,109 @@ export async function researchInterviewProcess(
   // Browser UA: search engines and many discussion sites block non-browser bots.
   const fetcher =
     options.fetcher ?? new Fetcher({ fetchFn: options.fetchFn, allowLocal, userAgent: BROWSER_USER_AGENT });
-  const query = `${company.name} interview process questions experience`;
-  diag.queries_attempted.push(query);
+  const maxDepth = options.maxDepth ?? 2;
+  const maxFetches = options.maxFetches ?? 12;
 
-  let results;
-  try {
-    results = await searchProvider.search(query, maxSources * 2);
-  } catch (err) {
-    // Blocked/unavailable search is recorded explicitly, not hidden as "no info".
-    diag.search_error = err instanceof Error ? err.message : String(err);
+  // Diversify queries (bounded) and merge/deduplicate results across them.
+  const queries = [
+    `${company.name} interview process`,
+    `${company.name} engineering interview experience`,
+  ];
+  diag.queries_attempted = queries;
+
+  const seenResult = new Set<string>();
+  const results: SearchResult[] = [];
+  let anySuccess = false;
+  let lastError: string | null = null;
+  for (const q of queries) {
+    try {
+      const rs = await searchProvider.search(q, maxSources * 2);
+      anySuccess = true;
+      for (const r of rs) {
+        if (!seenResult.has(r.url)) {
+          seenResult.add(r.url);
+          results.push(r);
+        }
+      }
+    } catch (err) {
+      lastError = err instanceof Error ? err.message : String(err);
+    }
+  }
+  // Distinguish "search backend blocked/unavailable" from "search found nothing".
+  if (!anySuccess && lastError) {
+    diag.search_error = lastError;
     return done(noInfo());
   }
   diag.returned_urls = results.map((r) => r.url);
   diag.search_results_returned = results.length;
   if (results.length === 0) return done(noInfo());
 
+  // Bounded, ranked, SSRF-guarded traversal: fetch each search result, and when a
+  // page is not itself company-specific evidence, follow its most interview-relevant
+  // links a little deeper (best-first). Every URL is de-duplicated and re-validated.
   const sources: string[] = [];
   const texts: string[] = [];
-  for (const result of results) {
-    if (texts.length >= maxSources) break;
-    const guard = checkUrl(result.url, { allowLocal });
-    if (!guard.ok) {
-      diag.rejected_sources.push({ url: result.url, reason: guard.reason });
-      continue;
-    }
-    const fetched = await fetcher.fetch(result.url);
-    if (!fetched.ok) {
-      diag.rejected_sources.push({ url: result.url, reason: fetched.reason });
-      continue;
-    }
-    diag.fetched_urls.push(result.url);
-    const page = extractPage(result.url, fetched.body);
+  const visited = new Set<string>();
+  interface Node {
+    url: string;
+    depth: number;
+    score: number;
+  }
+  const frontier: Node[] = results.map((r) => ({ url: r.url, depth: 0, score: Number.POSITIVE_INFINITY }));
+  let fetches = 0;
 
-    // Gate: the page must be real, company-specific interview-process evidence —
-    // not a homepage / Wikipedia / unrelated article that merely fetched.
-    const evidence = interviewEvidence(page.text, company.name);
-    if (!evidence.hasEvidence) {
-      const reason = !evidence.mentionsCompany
+  while (frontier.length > 0 && fetches < maxFetches && texts.length < maxSources) {
+    frontier.sort((a, b) => b.score - a.score); // search results first, then best links
+    const node = frontier.shift();
+    if (!node || visited.has(node.url)) continue;
+    visited.add(node.url);
+
+    const guard = checkUrl(node.url, { allowLocal });
+    if (!guard.ok) {
+      diag.rejected_sources.push({ url: node.url, reason: guard.reason });
+      continue;
+    }
+
+    fetches++;
+    const fetched = await fetcher.fetch(node.url);
+    if (!fetched.ok) {
+      diag.rejected_sources.push({ url: node.url, reason: fetched.reason });
+      continue;
+    }
+    diag.fetched_urls.push(node.url);
+    if (node.depth > 0) diag.followed_links.push(node.url);
+
+    const page = extractPage(node.url, fetched.body);
+    // Evidence uses contentText (anchor text removed) so a page cannot look like
+    // evidence merely because it LINKS to interview content.
+    const evidence = interviewEvidence(page.contentText, company.name);
+    if (evidence.hasEvidence) {
+      texts.push(page.contentText);
+      sources.push(node.url);
+      continue;
+    }
+
+    diag.rejected_sources.push({
+      url: node.url,
+      reason: !evidence.mentionsCompany
         ? evidence.processHits > 0
           ? 'interview-process content, but not specific to this company'
           : 'no interview-process evidence'
-        : 'mentions the company but describes no interview process';
-      diag.rejected_sources.push({ url: result.url, reason });
-      continue;
-    }
+        : 'mentions the company but describes no interview process',
+    });
 
-    texts.push(page.text);
-    sources.push(result.url);
+    // Follow the most interview-relevant links one hop deeper (bounded).
+    if (node.depth < maxDepth) {
+      const ranked = page.links
+        .map((l) => ({ url: l.url, score: scoreInterviewLink(l, company.name), depth: node.depth + 1 }))
+        .filter((l) => l.score > 0 && !visited.has(l.url) && !frontier.some((f) => f.url === l.url))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+      for (const l of ranked) {
+        diag.discovered_links.push(l.url);
+        frontier.push(l);
+      }
+    }
   }
   diag.evidence_sources = sources;
   diag.usable_search_results = sources.length;
