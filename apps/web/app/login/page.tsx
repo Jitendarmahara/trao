@@ -2,7 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'motion/react';
 import { api, ApiError } from '@/lib/api';
+import { Aurora } from '@/components/ui/aurora';
+import { SplitText } from '@/components/ui/split-text';
+import { Magnet } from '@/components/ui/magnet';
+
+const SPRING = { type: 'spring' as const, stiffness: 200, damping: 25 };
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,49 +34,93 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4">
-      <h1 className="mb-1 text-2xl font-bold">AI Interview Prep Kit</h1>
-      <p className="mb-6 text-sm text-slate-500">
-        {mode === 'login' ? 'Sign in to your kits.' : 'Create an account.'}
-      </p>
-      <form onSubmit={submit} className="space-y-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <label className="block text-sm font-medium">
-          Email
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-          />
-        </label>
-        <label className="block text-sm font-medium">
-          Password
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-          />
-        </label>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={busy}
-          className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
+      <Aurora />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#09090b] via-transparent to-[#09090b]/70" />
+
+      <div className="grid w-full max-w-5xl items-center gap-12 md:grid-cols-2">
+        <div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1, ...SPRING }}
+            className="mono mb-6 text-xs uppercase tracking-[0.2em] text-violet-400"
+          >
+            Your unfair interview advantage
+          </motion.p>
+          <h1 className="text-5xl font-semibold leading-[0.95] tracking-tighter sm:text-6xl">
+            <SplitText text="Walk in" />
+            <br />
+            <span className="serif font-normal text-violet-400">
+              <SplitText text="already prepared." delay={0.03} />
+            </span>
+          </h1>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, ...SPRING }}
+            className="mt-6 max-w-md text-lg leading-relaxed text-zinc-400"
+          >
+            Paste a job description, point us at the company, and get a researched
+            prep kit — questions, flashcards, and a day-by-day plan.
+          </motion.p>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, ...SPRING }}
+          className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-8 backdrop-blur"
         >
-          {busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
-        </button>
-      </form>
-      <button
-        type="button"
-        onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-        className="mt-4 text-sm text-slate-600 underline"
-      >
-        {mode === 'login' ? 'Need an account? Register' : 'Have an account? Sign in'}
-      </button>
+          <h2 className="mb-1 text-xl font-semibold">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
+          <p className="mb-6 text-sm text-zinc-500">{mode === 'login' ? 'Sign in to your kits.' : 'Start in seconds.'}</p>
+          <form onSubmit={submit} className="space-y-4">
+            <Field label="Email" type="email" value={email} onChange={setEmail} />
+            <Field label="Password" type="password" value={password} onChange={setPassword} minLength={8} />
+            {error && <p className="text-sm text-red-400">{error}</p>}
+            <Magnet>
+              <button
+                type="submit"
+                disabled={busy}
+                className="w-full rounded-full bg-violet-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-500 disabled:opacity-50"
+              >
+                {busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
+              </button>
+            </Magnet>
+          </form>
+          <button
+            type="button"
+            onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
+            className="mt-5 text-sm text-zinc-400 underline decoration-zinc-700 underline-offset-4 hover:text-zinc-200"
+          >
+            {mode === 'login' ? 'Need an account? Register' : 'Have an account? Sign in'}
+          </button>
+        </motion.div>
+      </div>
     </main>
+  );
+}
+
+function Field({
+  label, type, value, onChange, minLength,
+}: {
+  label: string;
+  type: string;
+  value: string;
+  onChange: (v: string) => void;
+  minLength?: number;
+}) {
+  return (
+    <label className="block text-sm font-medium text-zinc-300">
+      {label}
+      <input
+        type={type}
+        required
+        minLength={minLength}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1.5 w-full rounded-lg border border-zinc-700 bg-zinc-950/60 px-3 py-2.5 text-sm text-zinc-100 outline-none transition-colors focus:border-violet-500"
+      />
+    </label>
   );
 }

@@ -2,5 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light; }
-body { @apply bg-slate-50 text-slate-900 antialiased; }
+:root { color-scheme: dark; }
+html, body { background: #09090b; }
+body {
+  @apply text-zinc-100 antialiased;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+.serif { font-family: var(--font-serif), Georgia, serif; font-style: italic; }
+.mono { font-family: var(--font-mono), ui-monospace, monospace; }
+::selection { background: rgba(124, 58, 237, 0.35); }
