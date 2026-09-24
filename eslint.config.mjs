@@ -3,7 +3,8 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/.next/**', '**/node_modules/**', '**/coverage/**'],
+    // apps/web (Next.js + JSX) is linted/typechecked by its own toolchain.
+    ignores: ['**/dist/**', '**/.next/**', '**/node_modules/**', '**/coverage/**', 'apps/web/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
