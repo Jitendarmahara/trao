@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { readFile, writeFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
-import { createLlmClient, DuckDuckGoSearchProvider } from '@interview-prep-kit/core';
+import { createDefaultSearchProvider, createLlmClient } from '@interview-prep-kit/core';
 import { runBatch } from './batch/run-batch.js';
 
 /**
@@ -32,7 +32,7 @@ async function main(): Promise<void> {
   }
 
   const llm = createLlmClient();
-  const searchProvider = new DuckDuckGoSearchProvider();
+  const searchProvider = createDefaultSearchProvider();
 
   const result = await runBatch(cases, {
     llm,

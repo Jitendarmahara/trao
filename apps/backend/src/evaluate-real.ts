@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { createLlmClient, DuckDuckGoSearchProvider, loadLlmConfig } from '@interview-prep-kit/core';
+import { createDefaultSearchProvider, createLlmClient, loadLlmConfig } from '@interview-prep-kit/core';
 import { collectCase } from './report/collect.js';
 import { renderMarkdown } from './report/markdown.js';
 import { RealCaseSchema, type CaseReport, type RealCompanyReport } from './report/types.js';
@@ -22,7 +22,7 @@ async function main(): Promise<void> {
 
   const model = loadLlmConfig().model;
   const llm = createLlmClient();
-  const searchProvider = new DuckDuckGoSearchProvider();
+  const searchProvider = createDefaultSearchProvider();
 
   const cases: CaseReport[] = [];
   for (let i = 0; i < parsed.length; i++) {
