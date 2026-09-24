@@ -17,6 +17,8 @@ export interface SearchResult {
   url: string;
   title: string;
   snippet?: string;
+  /** Which backend produced this result (attribution preserved through merge). */
+  provider?: string;
 }
 
 /** Safe, secret-free observability for the interview-research stage. */

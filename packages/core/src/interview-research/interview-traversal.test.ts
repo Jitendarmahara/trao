@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { researchInterviewProcess } from './interview-research.js';
-import { StaticSearchProvider } from './search-provider.js';
+import { CompositeSearchProvider, StaticSearchProvider } from './search-provider.js';
 import type { InterviewResearchDiagnostics } from './types.js';
 import type { FetchFn } from '../shared/http.js';
 
@@ -128,6 +128,23 @@ describe('interview-research bounded traversal', () => {
     const { r, diag } = await research(s, 'https://f.test/thread');
     expect(r.found).toBe(false);
     expect(diag.rejected_sources.some((x) => x.url === 'https://redir.test/x' && /private|loopback/.test(x.reason))).toBe(true);
+  });
+
+  it('one provider’s inaccessible source does not sink research when another supplies accessible evidence', async () => {
+    // provider 1 → a source that 403s; provider 2 → an accessible company-specific write-up.
+    const composite = new CompositeSearchProvider([
+      new StaticSearchProvider([{ url: 'https://blocked.test/x', title: 'blocked', provider: 'p1' }]),
+      new StaticSearchProvider([{ url: 'https://good.test/exp', title: 'Acme interview experience', provider: 'p2' }]),
+    ]);
+    const s = site({ 'https://blocked.test/x': { status: 403 }, 'https://good.test/exp': EVIDENCE });
+    let diag: InterviewResearchDiagnostics | undefined;
+    const r = await researchInterviewProcess(
+      { name: 'Acme' },
+      { searchProvider: composite, fetchFn: s, onDiagnostics: (d) => (diag = d) },
+    );
+    expect(r.found).toBe(true);
+    expect(diag!.evidence_sources).toEqual(['https://good.test/exp']);
+    expect(diag!.rejected_sources.some((x) => x.url === 'https://blocked.test/x')).toBe(true);
   });
 
   it('TEST16: detects a signal that appears late in a long evidence page', async () => {

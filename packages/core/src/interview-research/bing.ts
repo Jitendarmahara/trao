@@ -64,6 +64,6 @@ export class BingSearchProvider implements SearchProvider {
     if (results.length === 0) {
       throw new SearchUnavailableError('Bing returned no organic results (possibly rate-limited)');
     }
-    return results.slice(0, limit);
+    return results.slice(0, limit).map((r) => ({ ...r, provider: 'bing' }));
   }
 }

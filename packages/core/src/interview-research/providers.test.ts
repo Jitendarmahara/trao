@@ -72,13 +72,30 @@ describe('CompositeSearchProvider', () => {
     },
   };
 
-  it('falls through to the first provider that returns results', async () => {
+  it('MERGES results across all providers (does not stop at the first non-empty)', async () => {
     const composite = new CompositeSearchProvider([
-      throwing,
-      new StaticSearchProvider([{ url: 'https://blog.example.com/x', title: 'x' }]),
+      new StaticSearchProvider([{ url: 'https://a.example.com/x', title: 'a', provider: 'p1' }]),
+      new StaticSearchProvider([{ url: 'https://b.example.com/y', title: 'b', provider: 'p2' }]),
     ]);
     const results = await composite.search('q');
-    expect(results[0].url).toBe('https://blog.example.com/x');
+    expect(results.map((r) => r.url)).toEqual(['https://a.example.com/x', 'https://b.example.com/y']);
+    expect(results.map((r) => r.provider)).toEqual(['p1', 'p2']); // attribution preserved
+  });
+
+  it('de-duplicates the same URL returned by multiple providers', async () => {
+    const composite = new CompositeSearchProvider([
+      new StaticSearchProvider([{ url: 'https://dup.example.com/x', title: 'a' }]),
+      new StaticSearchProvider([{ url: 'https://dup.example.com/x', title: 'a again' }]),
+    ]);
+    expect(await composite.search('q')).toHaveLength(1);
+  });
+
+  it('still contributes a working provider even if another throws', async () => {
+    const composite = new CompositeSearchProvider([
+      throwing,
+      new StaticSearchProvider([{ url: 'https://ok.example.com/x', title: 'x' }]),
+    ]);
+    expect((await composite.search('q')).map((r) => r.url)).toEqual(['https://ok.example.com/x']);
   });
 
   it('throws only when every provider is unavailable', async () => {

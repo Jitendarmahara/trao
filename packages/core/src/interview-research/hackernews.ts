@@ -53,6 +53,8 @@ export class HackerNewsSearchProvider implements SearchProvider {
       throw new SearchUnavailableError(`Hacker News search returned HTTP ${res.status}`);
     }
     const json: unknown = await res.json().catch(() => ({}));
-    return parseAlgolia(json).slice(0, limit * 2);
+    return parseAlgolia(json)
+      .slice(0, limit * 2)
+      .map((r) => ({ ...r, provider: 'hackernews' }));
   }
 }

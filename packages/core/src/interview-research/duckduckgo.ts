@@ -55,6 +55,8 @@ export class DuckDuckGoSearchProvider implements SearchProvider {
         `DuckDuckGo returned a challenge/anomaly page (HTTP ${res.status}) — the endpoint is rate-limiting or blocking this environment`,
       );
     }
-    return parseDuckDuckGoHtml(res.body).slice(0, limit);
+    return parseDuckDuckGoHtml(res.body)
+      .slice(0, limit)
+      .map((r) => ({ ...r, provider: 'duckduckgo' }));
   }
 }

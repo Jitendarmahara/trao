@@ -28,27 +28,36 @@ export class StaticSearchProvider implements SearchProvider {
 }
 
 /**
- * Tries providers in order and returns the first non-empty result set. Only when
- * EVERY provider throws (all unavailable) does it throw SearchUnavailableError;
- * if a provider responds but finds nothing, that is an honest empty result. Keeps
- * the search backend swappable and resilient across a flaky environment.
+ * Queries ALL providers and MERGES their results (de-duplicated by URL, order
+ * preserved, provider attribution kept). It does NOT stop at the first non-empty
+ * provider — that previously hid better, more-accessible sources behind a provider
+ * whose top results were blocked in this environment. Only when EVERY provider
+ * throws (all unavailable) does it throw SearchUnavailableError; a provider that
+ * responds with nothing is an honest empty contribution. Providers stay swappable.
  */
 export class CompositeSearchProvider implements SearchProvider {
   constructor(private readonly providers: SearchProvider[]) {}
 
   async search(query: string, limit?: number): Promise<SearchResult[]> {
+    const merged: SearchResult[] = [];
+    const seen = new Set<string>();
     const errors: string[] = [];
     for (const provider of this.providers) {
       try {
         const results = await provider.search(query, limit);
-        if (results.length > 0) return results;
+        for (const r of results) {
+          if (!seen.has(r.url)) {
+            seen.add(r.url);
+            merged.push(r);
+          }
+        }
       } catch (err) {
         errors.push(err instanceof Error ? err.message : String(err));
       }
     }
-    if (errors.length === this.providers.length && this.providers.length > 0) {
+    if (merged.length === 0 && errors.length === this.providers.length && this.providers.length > 0) {
       throw new SearchUnavailableError(`All search providers unavailable: ${errors.join(' | ')}`);
     }
-    return [];
+    return merged;
   }
 }
