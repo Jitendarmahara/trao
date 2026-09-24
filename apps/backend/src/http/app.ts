@@ -1,4 +1,4 @@
-import { PipelineError } from '@interview-prep-kit/core';
+import { PipelineError, validateKit } from '@interview-prep-kit/core';
 import cookieParser from 'cookie-parser';
 import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { z } from 'zod';
@@ -60,13 +60,28 @@ export function buildApp(deps: AppDeps): Express {
   };
 
   // Run a generation job to completion, persisting progress + result to the DB.
+  // NOTE ON RESTART SEMANTICS: only the job RECORD is persisted (so progress is
+  // observable and an in-flight job is dup-detectable). There is NO worker that
+  // resumes execution after a process restart — a `running` job interrupted by a
+  // restart is not auto-resumed. (A recovery reaper would need a global job query,
+  // which the repository intentionally does not expose here.)
   const runJob = async (job: GenerationJob): Promise<void> => {
     await jobs.update(job.id, { status: 'running' });
     try {
       const { kit, skipped } = await runner.run(job.input, (stage) => {
         void jobs.update(job.id, { stage });
       });
-      const stored = await kits.create({ userId: job.userId, kit, skipped });
+      // Gate persistence on structure validity, independent of which runner ran —
+      // never store a kit that fails the Appendix A contract (§13).
+      const check = validateKit(kit);
+      if (!check.ok) {
+        await jobs.update(job.id, {
+          status: 'failed',
+          error: { code: 'INVALID_KIT', message: check.errors.slice(0, 3).map((e) => `${e.path}: ${e.message}`).join('; ') },
+        });
+        return;
+      }
+      const stored = await kits.create({ userId: job.userId, kit: check.kit, skipped });
       await jobs.update(job.id, { status: 'done', kitId: stored.id });
     } catch (err) {
       const code = err instanceof PipelineError ? err.code : 'GENERATION_FAILED';
@@ -109,6 +124,9 @@ export function buildApp(deps: AppDeps): Express {
     }),
   );
 
+  // Logout clears the browser's session cookie. Because sessions are stateless
+  // HMAC tokens (no server-side store), any token already issued stays valid until
+  // its `exp`; logout does not retroactively invalidate previously-issued tokens.
   app.post('/auth/logout', (_req, res) => {
     res.clearCookie(SESSION_COOKIE, { path: '/' });
     res.json({ ok: true });
@@ -132,6 +150,17 @@ export function buildApp(deps: AppDeps): Express {
       const parsed = CreateKitSchema.safeParse(req.body);
       if (!parsed.success) {
         throw new AppError(400, 'INVALID_INPUT', parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '));
+      }
+      // Duplicate detection: if the same user already has an in-flight (pending/
+      // running) job for identical input, return it instead of starting a second.
+      const sameInput = (a: GenerationJob['input'], b: GenerationJob['input']): boolean =>
+        a.jd === b.jd && a.companyUrl === b.companyUrl && (a.companyName ?? '') === (b.companyName ?? '') && a.days === b.days;
+      const inFlight = (await jobs.listByUser(req.userId!)).find(
+        (j) => (j.status === 'pending' || j.status === 'running') && sameInput(j.input, parsed.data),
+      );
+      if (inFlight) {
+        res.status(202).json({ jobId: inFlight.id, deduplicated: true });
+        return;
       }
       const job = await jobs.create({
         userId: req.userId!,

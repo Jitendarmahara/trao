@@ -102,6 +102,39 @@ describe('kits', () => {
     expect(create.body.job.kitId).toBeNull();
   });
 
+  it('does NOT persist a kit that fails the Appendix A contract (validateKit gate)', async () => {
+    const invalidRunner: PipelineRunner = {
+      // difficulty 5 is out of the 1..3 range → validateKit must reject it.
+      run: async () => {
+        const bad = validKit('Acme');
+        (bad.questions[0] as { difficulty: number }).difficulty = 5;
+        return { kit: bad, skipped: [] };
+      },
+    };
+    const agent = request.agent(makeApp({ runner: invalidRunner }));
+    await agent.post('/auth/register').send(creds);
+    const create = await agent.post('/kits').send({ jd: 'JD', companyUrl: 'http://acme', days: 1 });
+    expect(create.body.job.status).toBe('failed');
+    expect(create.body.job.error.code).toBe('INVALID_KIT');
+    expect(create.body.job.kitId).toBeNull();
+    expect((await agent.get('/kits')).body.kits).toHaveLength(0); // nothing stored
+  });
+
+  it('de-duplicates an in-flight identical generation (returns the same job)', async () => {
+    // A runner that never resolves keeps the first job "running" so the second
+    // identical request must find it rather than starting a second run.
+    const hangingRunner: PipelineRunner = { run: () => new Promise(() => {}) };
+    const app = makeApp({ runner: hangingRunner, awaitGeneration: false });
+    const agent = request.agent(app);
+    await agent.post('/auth/register').send(creds);
+    const body = { jd: 'JD', companyUrl: 'http://acme', days: 2 };
+    const first = await agent.post('/kits').send(body);
+    const second = await agent.post('/kits').send(body);
+    expect(first.status).toBe(202);
+    expect(second.body.jobId).toBe(first.body.jobId); // same run
+    expect(second.body.deduplicated).toBe(true);
+  });
+
   it('validates the create request (400 on bad days)', async () => {
     const agent = request.agent(makeApp());
     await agent.post('/auth/register').send(creds);

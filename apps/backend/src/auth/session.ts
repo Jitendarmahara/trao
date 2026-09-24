@@ -19,6 +19,10 @@ function sign(data: string, secret: string): string {
  * Stateless, HMAC-signed session token (`<payload>.<sig>`) — no server-side
  * session store, matching the stateless-server design. Not encrypted, so it
  * carries only the user id + expiry, never secrets.
+ *
+ * Trade-off: because there is no server-side store, logout clears the browser
+ * cookie but does NOT invalidate tokens already issued — they remain valid until
+ * `exp`. (A global revocation would require server-side state / a token version.)
  */
 export function createSessionToken(userId: string, secret: string, ttlMs = DEFAULT_TTL_MS): string {
   const payload: SessionPayload = { userId, exp: Date.now() + ttlMs };

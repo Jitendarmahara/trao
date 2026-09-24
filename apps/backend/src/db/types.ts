@@ -20,9 +20,12 @@ export interface StoredKit {
 export type JobStatus = 'pending' | 'running' | 'failed' | 'done';
 
 /**
- * A generation job persisted in the DB (NOT in server memory) so a slow, 90s
- * generation survives a restart, the UI can poll progress, and a duplicate
- * trigger can find the existing run instead of starting a second one.
+ * A generation job persisted in the DB (NOT in server memory). The job RECORD
+ * (status/stage/error) survives a restart, so the UI can poll progress and a
+ * duplicate trigger can find an in-flight run instead of starting a second one.
+ * NOTE: execution itself is NOT auto-resumed after a restart — there is no worker
+ * that re-runs an interrupted job; a `running` job cut off by a restart stays
+ * `running` until a future recovery step (not implemented) marks it stale.
  */
 export interface GenerationJob {
   id: string;
