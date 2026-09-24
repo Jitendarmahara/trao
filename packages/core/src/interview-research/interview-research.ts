@@ -183,8 +183,11 @@ export async function researchInterviewProcess(
   diag.usable_search_results = sources.length;
   if (texts.length === 0) return done(noInfo());
 
-  const combined = texts.join('\n\n').slice(0, 6_000);
-  const signals = detectSignals(combined);
+  // Detect signals over ALL evidence text; only the LLM prompt is truncated for
+  // token budget — signal detection must not be limited by that budget.
+  const evidenceText = texts.join('\n\n');
+  const signals = detectSignals(evidenceText);
+  const promptText = evidenceText.slice(0, 6_000);
 
   let summary = '';
   let rounds: string[] = [];
@@ -199,7 +202,7 @@ export async function researchInterviewProcess(
           },
           {
             role: 'user',
-            content: `From the following public text about "${company.name}" interviews, return JSON {"summary": string, "rounds": string[]}. "summary": 1-3 sentences describing the process, or "" if the text does not describe it. "rounds": ordered stage names you can support (e.g. "recruiter screen","take-home","system design","behavioural"), or [].\n\nTEXT:\n${combined}`,
+            content: `From the following public text about "${company.name}" interviews, return JSON {"summary": string, "rounds": string[]}. "summary": 1-3 sentences describing the process, or "" if the text does not describe it. "rounds": ordered stage names you can support (e.g. "recruiter screen","take-home","system design","behavioural"), or [].\n\nTEXT:\n${promptText}`,
           },
         ],
         schema: SummarySchema,

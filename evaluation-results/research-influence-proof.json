@@ -1,29 +1,31 @@
 {
-  "note": "Same technical-only JD + company; only difference is discovered interview research (a real page fetched live). Categories present only WITH research prove the findings change the question mix.",
-  "real_source": "https://www.tryexponent.com/blog/system-design-interview-guide",
+  "note": "CAUSAL PIPELINE TEST (not live discovery). Same technical-only JD + company; the only difference is whether interview research is present. The pinned source is a real, company-specific interview write-up fetched live that passes the production evidence gate. Categories present only WITH research show the findings change the question mix.",
+  "real_source": "https://blog.rampatra.com/spotify-interview-backend-engineer-ii",
   "with_research": {
     "label": "with_interview_research",
     "interview_research": {
       "found": true,
-      "summary": "The text describes system design interviews as 45- to 60-minute conversations where candidates architect a software system from an open-ended prompt, with no single correct answer. It notes that the bar is higher in 2026 and that AI/LLM infrastructure prompts have moved into general engineering loops.",
+      "summary": "Spotify's Backend Engineer II interview process in Stockholm began with a recruiter phone call, followed by a technical video call with two engineers, an online cognitive ability test, and a 5-hour on-site interview (4 rounds plus lunch), ending with an offer from HR.",
       "rounds": [
-        "system design"
+        "recruiter phone call",
+        "video call with two engineers",
+        "online cognitive ability test",
+        "on-site interview"
       ],
       "hasTakeHome": false,
-      "hasSystemDesign": true,
+      "hasSystemDesign": false,
       "behaviouralEmphasis": true,
       "sources": [
-        "https://www.tryexponent.com/blog/system-design-interview-guide"
+        "https://blog.rampatra.com/spotify-interview-backend-engineer-ii"
       ]
     },
     "categories": [
       "technical",
       "behavioural",
-      "system-design",
       "company-fit"
     ],
-    "behavioural_questions": 4,
-    "system_design_questions": 5
+    "behavioural_questions": 10,
+    "system_design_questions": 0
   },
   "without_research": {
     "label": "without_interview_research",

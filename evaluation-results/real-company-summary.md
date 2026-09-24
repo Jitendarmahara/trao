@@ -1,6 +1,6 @@
 # Real Company Evaluation Summary
 
-Generated: 2026-09-24T06:13:07.726Z
+Generated: 2026-09-24T06:44:55.494Z
 Report version: 1.0
 Cases: 5 (5 ok, 0 failed)
 
@@ -13,9 +13,9 @@ OK
 
 ## Timing
 
-- Total: 27645 ms
-- LLM calls: 6 (23190 ms, model deepseek-chat)
-- Stages: extracting(2078ms) → crawling(3434ms) → interview-research(1015ms) → generating(21114ms) → covering(1ms) → scheduling(1ms) → validating(2ms) → done(0ms)
+- Total: 33119 ms
+- LLM calls: 6 (28676 ms, model deepseek-chat)
+- Stages: extracting(1066ms) → crawling(3416ms) → interview-research(1017ms) → generating(27614ms) → covering(1ms) → scheduling(2ms) → validating(2ms) → done(1ms)
 
 ## Requirements
 
@@ -48,14 +48,17 @@ OK
 
 _Diagnostics:_
 - Queries: "Stripe interview process questions experience"
-- Search results returned: 2 · usable: 0
-- Fetched sources: (none)
+- Returned URLs (2): https://news.ycombinator.com/item?id=29387264, https://news.ycombinator.com/item?id=33525394
+- Fetched URLs: (none)
+- Evidence sources (company-specific interview evidence): (none)
 - Rejected: https://news.ycombinator.com/item?id=29387264 (fetch failed); https://news.ycombinator.com/item?id=33525394 (fetch failed)
+- Evidence decision → found: false (usable sources: 0)
+- Detected signals: take-home=false, system-design=false, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 28 questions (technical: 18, behavioural: 4, company-fit: 6)
+- 30 questions (technical: 18, behavioural: 4, company-fit: 8)
 
 ## Coverage
 
@@ -67,28 +70,28 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 5+ years of backend engineering experience | must | q1, q2, q23 |
-| r2: Strong experience with TypeScript or Node.js | must | q3, q4, q24 |
+| r1: 5+ years of backend engineering experience | must | q1, q2, q23, q30 |
+| r2: Strong experience with TypeScript or Node.js | must | q3, q4, q23 |
 | r3: Strong PostgreSQL experience | must | q5, q6, q24 |
-| r4: Experience designing distributed systems | must | q7, q8, q23 |
+| r4: Experience designing distributed systems | must | q7, q8, q25, q30 |
 | r5: Experience with REST APIs and event-driven systems | must | q9, q10, q25 |
-| r6: Experience with AWS or similar cloud platforms | must | q11, q12, q25 |
-| r7: Experience mentoring engineers | must | q19, q20, q26 |
-| r8: Strong communication and collaboration skills | must | q21, q22, q26 |
-| r9: Experience with payments or financial systems | nice | q13, q14, q27 |
-| r10: Experience with Kafka | nice | q15, q16, q28 |
-| r11: Experience with Kubernetes | nice | q17, q18, q28 |
+| r6: Experience with AWS or similar cloud platforms | must | q11, q12, q26 |
+| r7: Experience mentoring engineers | must | q19, q20, q27 |
+| r8: Strong communication and collaboration skills | must | q21, q22, q27 |
+| r9: Experience with payments or financial systems | nice | q13, q14, q28 |
+| r10: Experience with Kafka | nice | q15, q16, q29 |
+| r11: Experience with Kubernetes | nice | q17, q18, q29 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical | 4 | 240 |
-| 2 | Technical | 4 | 240 |
-| 3 | Behavioural & Company fit | 4 | 240 |
-| 4 | Technical | 4 | 160 |
-| 5 | Behavioural & Company fit | 4 | 160 |
-| 6 | Technical | 4 | 240 |
+| 1 | Technical | 5 | 300 |
+| 2 | Company fit & Technical | 4 | 240 |
+| 3 | Technical & Company fit | 4 | 180 |
+| 4 | Technical & Behavioural | 5 | 200 |
+| 5 | Company fit & Behavioural | 4 | 160 |
+| 6 | Technical & Company fit | 4 | 240 |
 | 7 | Technical & Company fit | 4 | 160 |
 
 ## Final checks
@@ -96,8 +99,8 @@ _Diagnostics:_
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 11 (must 8, nice 3)
-- Questions: 28 · Flashcards: 11
-- Schedule: 7 days, 28 question slots
+- Questions: 30 · Flashcards: 11
+- Schedule: 7 days, 30 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
@@ -116,9 +119,9 @@ OK
 
 ## Timing
 
-- Total: 27983 ms
-- LLM calls: 7 (24695 ms, model deepseek-chat)
-- Stages: extracting(1475ms) → crawling(1686ms) → interview-research(2415ms) → generating(22406ms) → covering(0ms) → scheduling(0ms) → validating(0ms) → done(1ms)
+- Total: 26023 ms
+- LLM calls: 6 (21080 ms, model deepseek-chat)
+- Stages: extracting(1274ms) → crawling(1168ms) → interview-research(3772ms) → generating(19807ms) → covering(0ms) → scheduling(1ms) → validating(1ms) → done(0ms)
 
 ## Requirements
 
@@ -145,21 +148,24 @@ OK
 
 ## Interview research
 
-- Found: true
+- Found: false
 - Signals: take-home=false, system-design=false, behavioural=false
-- Summary: Public discussion was found but did not clearly describe the interview process.
-- Sources: https://www.shopify.com/, https://www.shopify.com/in, https://en.wikipedia.org/wiki/Shopify
+- Summary: No public information about the interview process was found.
+- Sources: (none)
 
 _Diagnostics:_
 - Queries: "Shopify interview process questions experience"
-- Search results returned: 6 · usable: 3
-- Fetched sources: https://www.shopify.com/, https://www.shopify.com/in, https://en.wikipedia.org/wiki/Shopify
-- Rejected: (none)
+- Returned URLs (6): https://www.shopify.com/, https://www.shopify.com/in, https://en.wikipedia.org/wiki/Shopify, https://apps.shopify.com/, https://themes.shopify.com/, https://play.google.com/store/apps/details?id=com.shopify.mobile&hl=en-US
+- Fetched URLs: https://www.shopify.com/, https://www.shopify.com/in, https://en.wikipedia.org/wiki/Shopify, https://apps.shopify.com/, https://themes.shopify.com/, https://play.google.com/store/apps/details?id=com.shopify.mobile&hl=en-US
+- Evidence sources (company-specific interview evidence): (none)
+- Rejected: https://www.shopify.com/ (mentions the company but describes no interview process); https://www.shopify.com/in (mentions the company but describes no interview process); https://en.wikipedia.org/wiki/Shopify (mentions the company but describes no interview process); https://apps.shopify.com/ (mentions the company but describes no interview process); https://themes.shopify.com/ (mentions the company but describes no interview process); https://play.google.com/store/apps/details?id=com.shopify.mobile&hl=en-US (mentions the company but describes no interview process)
+- Evidence decision → found: false (usable sources: 0)
+- Detected signals: take-home=false, system-design=false, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 29 questions (technical: 14, behavioural: 4, company-fit: 11)
+- 20 questions (technical: 10, behavioural: 2, company-fit: 8)
 
 ## Coverage
 
@@ -171,36 +177,36 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 3+ years of backend development experience | must | q1, q19 |
-| r2: Strong Ruby, Node.js, or similar backend experience | must | q1, q2, q19 |
-| r3: Experience building REST APIs | must | q3, q4, q20 |
-| r4: Strong SQL and relational database knowledge | must | q5, q6, q21 |
-| r5: Experience with distributed systems | must | q7, q8, q22 |
-| r6: Experience working with high-traffic applications | must | q9, q10, q23 |
-| r7: Strong problem-solving skills | must | q15, q16, q24 |
-| r8: Ability to work effectively with product and engineering teams | must | q17, q18, q25 |
-| r9: E-commerce experience | nice | q11, q26 |
-| r10: Experience with GraphQL | nice | q12, q27 |
-| r11: Experience with Kubernetes | nice | q13, q28 |
-| r12: Experience with event-driven architecture | nice | q14, q29 |
+| r1: 3+ years of backend development experience | must | q1, q13 |
+| r2: Strong Ruby, Node.js, or similar backend experience | must | q1, q2, q13 |
+| r3: Experience building REST APIs | must | q2, q14 |
+| r4: Strong SQL and relational database knowledge | must | q3, q4, q14 |
+| r5: Experience with distributed systems | must | q4, q5, q15, q16 |
+| r6: Experience working with high-traffic applications | must | q5, q6, q15 |
+| r7: Strong problem-solving skills | must | q12, q17 |
+| r8: Ability to work effectively with product and engineering teams | must | q11, q18 |
+| r9: E-commerce experience | nice | q7, q19 |
+| r10: Experience with GraphQL | nice | q8, q19 |
+| r11: Experience with Kubernetes | nice | q9, q20 |
+| r12: Experience with event-driven architecture | nice | q10, q16 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical & Behavioural | 6 | 360 |
-| 2 | Technical & Company fit | 6 | 300 |
-| 3 | Technical & Behavioural | 6 | 240 |
-| 4 | Company fit & Technical | 6 | 280 |
-| 5 | Company fit & Technical | 5 | 200 |
+| 1 | Technical & Behavioural | 4 | 240 |
+| 2 | Technical & Company fit | 4 | 180 |
+| 3 | Company fit & Technical | 4 | 160 |
+| 4 | Company fit & Technical | 4 | 180 |
+| 5 | Technical & Company fit | 4 | 180 |
 
 ## Final checks
 
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 12 (must 8, nice 4)
-- Questions: 29 · Flashcards: 12
-- Schedule: 5 days, 29 question slots
+- Questions: 20 · Flashcards: 12
+- Schedule: 5 days, 20 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
@@ -219,9 +225,9 @@ OK
 
 ## Timing
 
-- Total: 30934 ms
-- LLM calls: 6 (24153 ms, model deepseek-chat)
-- Stages: extracting(944ms) → crawling(6053ms) → interview-research(725ms) → generating(23210ms) → covering(0ms) → scheduling(1ms) → validating(1ms) → done(0ms)
+- Total: 30651 ms
+- LLM calls: 6 (22793 ms, model deepseek-chat)
+- Stages: extracting(1239ms) → crawling(7002ms) → interview-research(854ms) → generating(21555ms) → covering(0ms) → scheduling(1ms) → validating(0ms) → done(0ms)
 
 ## Requirements
 
@@ -255,14 +261,17 @@ OK
 
 _Diagnostics:_
 - Queries: "Linear interview process questions experience"
-- Search results returned: 1 · usable: 0
-- Fetched sources: (none)
+- Returned URLs (1): https://news.ycombinator.com/item?id=964506
+- Fetched URLs: (none)
+- Evidence sources (company-specific interview evidence): (none)
 - Rejected: https://news.ycombinator.com/item?id=964506 (fetch failed)
+- Evidence decision → found: false (usable sources: 0)
+- Detected signals: take-home=false, system-design=false, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 31 questions (technical: 22, behavioural: 2, company-fit: 7)
+- 23 questions (technical: 15, behavioural: 2, company-fit: 6)
 
 ## Coverage
 
@@ -274,34 +283,34 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 4+ years of software engineering experience | must | q1, q2, q25 |
-| r2: Strong TypeScript and React experience | must | q3, q4, q26 |
-| r3: Strong backend development experience | must | q5, q6, q27 |
-| r4: Experience designing APIs | must | q7, q8, q27 |
-| r5: Experience with PostgreSQL | must | q9, q10, q28 |
-| r6: Experience building polished user-facing products | must | q11, q12, q26 |
-| r7: Strong understanding of software architecture | must | q13, q14, q25 |
-| r8: Strong communication and collaboration skills | must | q23, q24, q29 |
-| r9: Experience with AI-powered products | nice | q15, q16, q30 |
-| r10: Experience with GraphQL | nice | q17, q18, q30 |
-| r11: Experience with real-time systems | nice | q19, q20, q31 |
-| r12: Experience at a fast-growing startup | nice | q21, q22, q31 |
+| r1: 4+ years of software engineering experience | must | q1, q2, q18 |
+| r2: Strong TypeScript and React experience | must | q3, q4, q19 |
+| r3: Strong backend development experience | must | q5, q6, q20 |
+| r4: Experience designing APIs | must | q6, q7, q20 |
+| r5: Experience with PostgreSQL | must | q8, q9, q21 |
+| r6: Experience building polished user-facing products | must | q10, q19 |
+| r7: Strong understanding of software architecture | must | q2, q11, q21 |
+| r8: Strong communication and collaboration skills | must | q16, q17, q22 |
+| r9: Experience with AI-powered products | nice | q12, q23 |
+| r10: Experience with GraphQL | nice | q13, q23 |
+| r11: Experience with real-time systems | nice | q14, q23 |
+| r12: Experience at a fast-growing startup | nice | q15, q18 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical & Company fit | 11 | 620 |
-| 2 | Technical & Company fit | 10 | 380 |
-| 3 | Technical & Company fit | 10 | 480 |
+| 1 | Technical & Company fit | 8 | 440 |
+| 2 | Technical & Company fit | 8 | 320 |
+| 3 | Technical & Company fit | 7 | 260 |
 
 ## Final checks
 
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 12 (must 8, nice 4)
-- Questions: 31 · Flashcards: 12
-- Schedule: 3 days, 31 question slots
+- Questions: 23 · Flashcards: 13
+- Schedule: 3 days, 23 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
@@ -320,9 +329,9 @@ OK
 
 ## Timing
 
-- Total: 28354 ms
-- LLM calls: 7 (23826 ms, model deepseek-chat)
-- Stages: extracting(1513ms) → crawling(1794ms) → interview-research(3379ms) → generating(21668ms) → covering(0ms) → scheduling(0ms) → validating(0ms) → done(0ms)
+- Total: 32769 ms
+- LLM calls: 6 (28649 ms, model deepseek-chat)
+- Stages: extracting(1231ms) → crawling(1966ms) → interview-research(2152ms) → generating(27420ms) → covering(0ms) → scheduling(0ms) → validating(0ms) → done(0ms)
 
 ## Requirements
 
@@ -349,21 +358,24 @@ OK
 
 ## Interview research
 
-- Found: true
+- Found: false
 - Signals: take-home=false, system-design=false, behavioural=false
-- Summary: Public discussion was found but did not clearly describe the interview process.
-- Sources: https://www.notion.com/, https://www.notion.com/desktop, https://en.wikipedia.org/wiki/Notion_(productivity_software)
+- Summary: No public information about the interview process was found.
+- Sources: (none)
 
 _Diagnostics:_
 - Queries: "Notion interview process questions experience"
-- Search results returned: 6 · usable: 3
-- Fetched sources: https://www.notion.com/, https://www.notion.com/desktop, https://en.wikipedia.org/wiki/Notion_(productivity_software)
-- Rejected: https://app.notion.com/login (page text too short); https://app.notion.com/signup (page text too short)
+- Returned URLs (6): https://www.notion.com/, https://app.notion.com/login, https://www.notion.com/desktop, https://app.notion.com/signup, https://en.wikipedia.org/wiki/Notion_(productivity_software), https://www.notion.com/getting-started
+- Fetched URLs: https://www.notion.com/, https://app.notion.com/login, https://www.notion.com/desktop, https://app.notion.com/signup, https://en.wikipedia.org/wiki/Notion_(productivity_software), https://www.notion.com/getting-started
+- Evidence sources (company-specific interview evidence): (none)
+- Rejected: https://www.notion.com/ (mentions the company but describes no interview process); https://app.notion.com/login (no interview-process evidence); https://www.notion.com/desktop (mentions the company but describes no interview process); https://app.notion.com/signup (no interview-process evidence); https://en.wikipedia.org/wiki/Notion_(productivity_software) (mentions the company but describes no interview process); https://www.notion.com/getting-started (no interview-process evidence)
+- Evidence decision → found: false (usable sources: 0)
+- Detected signals: take-home=false, system-design=false, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 21 questions (technical: 10, behavioural: 4, company-fit: 7)
+- 27 questions (technical: 16, behavioural: 4, company-fit: 7)
 
 ## Coverage
 
@@ -375,35 +387,35 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 3+ years of software engineering experience | must | q1, q15 |
-| r2: Strong TypeScript experience | must | q2, q3, q16 |
-| r3: Experience building AI-powered applications | must | q4, q5, q15, q16 |
-| r4: Experience with APIs and distributed services | must | q3, q6, q17 |
-| r5: Experience working with databases | must | q7, q17 |
-| r6: Strong debugging and problem-solving skills | must | q1, q18 |
-| r7: Ability to work cross-functionally | must | q11, q12, q19 |
-| r8: Strong written and verbal communication | must | q13, q14, q18, q19 |
-| r9: Experience with LLM applications | nice | q4, q20 |
-| r10: Experience with RAG systems | nice | q5, q8, q20 |
-| r11: Experience with agentic systems | nice | q8, q9, q21 |
-| r12: Experience with React | nice | q10, q21 |
+| r1: 3+ years of software engineering experience | must | q15, q16, q21 |
+| r2: Strong TypeScript experience | must | q1, q2, q21 |
+| r3: Experience building AI-powered applications | must | q3, q22 |
+| r4: Experience with APIs and distributed services | must | q4, q5, q23 |
+| r5: Experience working with databases | must | q6, q7, q23 |
+| r6: Strong debugging and problem-solving skills | must | q8, q9, q24 |
+| r7: Ability to work cross-functionally | must | q17, q18, q25 |
+| r8: Strong written and verbal communication | must | q19, q20, q24, q25 |
+| r9: Experience with LLM applications | nice | q10, q22 |
+| r10: Experience with RAG systems | nice | q11, q26 |
+| r11: Experience with agentic systems | nice | q12, q26 |
+| r12: Experience with React | nice | q13, q14, q27 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical & Company fit | 6 | 360 |
-| 2 | Technical & Behavioural | 5 | 200 |
-| 3 | Company fit & Behavioural | 5 | 200 |
-| 4 | Technical & Company fit | 5 | 280 |
+| 1 | Technical & Behavioural | 7 | 400 |
+| 2 | Technical & Behavioural | 7 | 280 |
+| 3 | Company fit & Behavioural | 7 | 260 |
+| 4 | Technical & Company fit | 6 | 260 |
 
 ## Final checks
 
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 12 (must 8, nice 4)
-- Questions: 21 · Flashcards: 12
-- Schedule: 4 days, 21 question slots
+- Questions: 27 · Flashcards: 12
+- Schedule: 4 days, 27 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
@@ -422,9 +434,9 @@ OK
 
 ## Timing
 
-- Total: 32800 ms
-- LLM calls: 6 (24432 ms, model deepseek-chat)
-- Stages: extracting(1534ms) → crawling(7592ms) → interview-research(775ms) → generating(22898ms) → covering(0ms) → scheduling(0ms) → validating(1ms) → done(0ms)
+- Total: 31580 ms
+- LLM calls: 6 (24795 ms, model deepseek-chat)
+- Stages: extracting(1258ms) → crawling(6082ms) → interview-research(700ms) → generating(23539ms) → covering(0ms) → scheduling(0ms) → validating(1ms) → done(0ms)
 
 ## Requirements
 
@@ -458,14 +470,17 @@ OK
 
 _Diagnostics:_
 - Queries: "Airbnb interview process questions experience"
-- Search results returned: 1 · usable: 0
-- Fetched sources: (none)
+- Returned URLs (1): https://news.ycombinator.com/item?id=16877457
+- Fetched URLs: (none)
+- Evidence sources (company-specific interview evidence): (none)
 - Rejected: https://news.ycombinator.com/item?id=16877457 (fetch failed)
+- Evidence decision → found: false (usable sources: 0)
+- Detected signals: take-home=false, system-design=false, behavioural=false
 - Search error: (none)
 
 ## Initial question generation
 
-- 21 questions (technical: 13, behavioural: 2, company-fit: 6)
+- 27 questions (technical: 16, behavioural: 2, company-fit: 9)
 
 ## Coverage
 
@@ -477,38 +492,38 @@ _Diagnostics:_
 
 | Requirement | Priority | Questions |
 | --- | --- | --- |
-| r1: 4+ years of backend engineering experience | must | q1, q16 |
-| r2: Experience with Java, Python, Go, or Node.js | must | q2, q17 |
-| r3: Experience building scalable distributed systems | must | q1, q2, q16, q17 |
-| r4: Strong SQL and database fundamentals | must | q3, q4, q18 |
-| r5: Experience designing APIs | must | q5, q6, q19 |
-| r6: Experience with caching and asynchronous processing | must | q7, q8, q18 |
-| r7: Strong testing and debugging skills | must | q9, q10, q20 |
-| r8: Strong communication skills | must | q14, q15, q19, q20 |
-| r9: Marketplace experience | nice | q6, q21 |
-| r10: Experience with recommendation systems | nice | q11 |
-| r11: Experience with high-scale consumer applications | nice | q12, q21 |
-| r12: Experience with Kubernetes | nice | q13 |
+| r1: 4+ years of backend engineering experience | must | q1, q19 |
+| r2: Experience with Java, Python, Go, or Node.js | must | q2, q20 |
+| r3: Experience building scalable distributed systems | must | q1, q3, q19 |
+| r4: Strong SQL and database fundamentals | must | q4, q5, q21 |
+| r5: Experience designing APIs | must | q6, q7, q20 |
+| r6: Experience with caching and asynchronous processing | must | q8, q9, q22 |
+| r7: Strong testing and debugging skills | must | q10, q11, q23 |
+| r8: Strong communication skills | must | q17, q18, q24 |
+| r9: Marketplace experience | nice | q12, q25 |
+| r10: Experience with recommendation systems | nice | q13, q26 |
+| r11: Experience with high-scale consumer applications | nice | q14, q25 |
+| r12: Experience with Kubernetes | nice | q15, q16, q27 |
 
 ## Schedule
 
 | Day | Focus | Questions | Minutes |
 | --- | --- | --- | --- |
-| 1 | Technical | 3 | 180 |
-| 2 | Technical & Behavioural | 3 | 180 |
-| 3 | Technical & Company fit | 3 | 140 |
-| 4 | Technical | 3 | 120 |
-| 5 | Company fit & Behavioural | 3 | 120 |
-| 6 | Company fit & Technical | 3 | 140 |
-| 7 | Technical & Company fit | 3 | 160 |
+| 1 | Technical | 4 | 240 |
+| 2 | Company fit & Technical | 4 | 240 |
+| 3 | Technical | 4 | 160 |
+| 4 | Technical & Behavioural | 4 | 160 |
+| 5 | Company fit & Technical | 4 | 180 |
+| 6 | Technical & Company fit | 4 | 220 |
+| 7 | Technical & Company fit | 3 | 120 |
 
 ## Final checks
 
 - Structure valid: true
 - All must-haves covered: true (uncovered: [])
 - Requirements: 12 (must 8, nice 4)
-- Questions: 21 · Flashcards: 12
-- Schedule: 7 days, 21 question slots
+- Questions: 27 · Flashcards: 12
+- Schedule: 7 days, 27 question slots
 - Duplicate question ids: []
 - Duplicate requirement ids: []
 - Invalid requirement references: []
