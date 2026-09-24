@@ -27,15 +27,42 @@ async function research(fetchFn: FetchFn, seed: string, opts: Record<string, unk
 }
 
 describe('interview-research bounded traversal', () => {
-  it('TEST2: follows an interview link from a no-evidence landing page to the write-up', async () => {
+  it('THE PROOF: search result → intermediate (no evidence) → deeper interview page → found', async () => {
     const s = site({
+      // Intermediate page: mentions the company, but NO interview-process content in
+      // its body — only an anchor that links to the real write-up.
       'https://f.test/thread': '<body>Notes about Acme jobs. <a href="/interview-experience">Acme interview experience</a></body>',
+      // Deeper page: the actual company-specific interview write-up (real evidence).
       'https://f.test/interview-experience': EVIDENCE,
     });
     const { r, diag } = await research(s, 'https://f.test/thread');
-    expect(r.found).toBe(true);
-    expect(diag.evidence_sources).toEqual(['https://f.test/interview-experience']);
+
+    // the intermediate page WAS fetched
+    expect(diag.fetched_urls).toContain('https://f.test/thread');
+    // the deeper interview page WAS fetched (followed from the intermediate)
+    expect(diag.fetched_urls).toContain('https://f.test/interview-experience');
     expect(diag.followed_links).toContain('https://f.test/interview-experience');
+    // the deeper page (not the intermediate) is the evidence source
+    expect(diag.evidence_sources).toEqual(['https://f.test/interview-experience']);
+    // the deeper page changed the research result
+    expect(r.found).toBe(true);
+    // signals from the deeper page are detected
+    expect(r.hasSystemDesign).toBe(true);
+    expect(r.hasTakeHome).toBe(true);
+    expect(r.behaviouralEmphasis).toBe(true);
+    // the intermediate page is NOT counted as evidence (anchor text is not evidence)
+    expect(diag.evidence_sources).not.toContain('https://f.test/thread');
+  });
+
+  it('anchor text alone cannot make found=true (deeper page missing → false)', async () => {
+    // The intermediate only has an "interview experience" ANCHOR; the linked page 404s.
+    const s = site({
+      'https://f.test/thread': '<body>Notes about Acme jobs. <a href="/interview-experience">Acme interview experience</a></body>',
+      // '/interview-experience' intentionally absent → 404
+    });
+    const { r, diag } = await research(s, 'https://f.test/thread');
+    expect(r.found).toBe(false);
+    expect(diag.evidence_sources).toEqual([]);
   });
 
   it('TEST3: reaches evidence two hops deep', async () => {
