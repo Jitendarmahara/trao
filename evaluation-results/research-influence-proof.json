@@ -5,12 +5,13 @@
     "label": "with_interview_research",
     "interview_research": {
       "found": true,
-      "summary": "Spotify's Backend Engineer II interview process in Stockholm began with a recruiter phone call, followed by a technical video call with two engineers, an online cognitive ability test, and a 5-hour on-site interview (4 rounds plus lunch), ending with an offer from HR.",
+      "summary": "The Spotify Backend Engineer II interview process in Stockholm began with a recruiter phone call, followed by a technical video call with two engineers, a non-technical online test, and an on-site interview of four rounds plus lunch, ending with an offer from HR.",
       "rounds": [
         "recruiter phone call",
         "video call with two engineers",
-        "online cognitive ability test",
-        "on-site interview"
+        "non-technical online test",
+        "on-site interview",
+        "behavioral round"
       ],
       "hasTakeHome": false,
       "hasSystemDesign": false,
