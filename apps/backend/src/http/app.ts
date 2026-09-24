@@ -1,4 +1,23 @@
-import { PipelineError, validateKit } from '@interview-prep-kit/core';
+import {
+  PipelineError,
+  validateKit,
+  addFlashcard,
+  addQuestion,
+  deleteFlashcard,
+  deleteQuestion,
+  editBrief,
+  editFlashcard,
+  editQuestion,
+  moveQuestion,
+  regenerateBrief,
+  regenerateFlashcards,
+  regenerateQuestionCategory,
+  regenerateSchedule,
+  reorderCategory,
+  setQuestionPinned,
+  type Kit,
+  type QuestionCategory,
+} from '@interview-prep-kit/core';
 import cookieParser from 'cookie-parser';
 import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { z } from 'zod';
@@ -6,11 +25,36 @@ import { createSessionToken, SESSION_COOKIE, verifySessionToken } from '../auth/
 import { hashPassword, verifyPassword } from '../auth/password.js';
 import type { GenerationJob, Repositories, StoredKit } from '../db/types.js';
 import type { PipelineRunner } from '../pipeline-runner.js';
+import type { SectionGenerator } from '../section-generator.js';
 import { AppError, asyncHandler, errorHandler } from './errors.js';
+
+const QUESTION_CATEGORIES = ['technical', 'behavioural', 'system-design', 'company-fit'] as const;
+const CategoryEnum = z.enum(QUESTION_CATEGORIES);
+const isCategory = (s: string): s is QuestionCategory => (QUESTION_CATEGORIES as readonly string[]).includes(s);
+
+const EditQuestionSchema = z.object({
+  prompt: z.string().optional(),
+  answer_outline: z.string().optional(),
+  difficulty: z.number().int().min(1).max(3).optional(),
+  requirement_ids: z.array(z.string()).optional(),
+});
+const AddQuestionSchema = z.object({
+  category: CategoryEnum,
+  requirement_ids: z.array(z.string()),
+  prompt: z.string().min(1),
+  answer_outline: z.string(),
+  difficulty: z.number().int().min(1).max(3),
+});
+const ReorderSchema = z.object({ category: CategoryEnum, orderedIds: z.array(z.string()) });
+const AddFlashcardSchema = z.object({ front: z.string().min(1), back: z.string(), requirement_ids: z.array(z.string()) });
+const EditFlashcardSchema = z.object({ front: z.string().optional(), back: z.string().optional(), requirement_ids: z.array(z.string()).optional() });
+const EditBriefSchema = z.object({ summary: z.string().optional(), what_they_do: z.string().optional() });
 
 export interface AppDeps {
   repositories: Repositories;
   runner: PipelineRunner;
+  /** Produces fresh content for regenerate-section; absent → 501 on regenerate. */
+  sectionGenerator?: SectionGenerator;
   sessionSecret: string;
   /** When true, POST /kits waits for generation to finish (used by tests). */
   awaitGeneration?: boolean;
@@ -227,6 +271,99 @@ export function buildApp(deps: AppDeps): Express {
       res.json({ ok: true });
     }),
   );
+
+  // ── Builder (server-authoritative): the client sends a COMMAND; the server
+  //    reads the persisted kit, applies the op, re-validates, and saves. The whole
+  //    kit is never sent by the client, so a regeneration can't clobber edits. ──
+  const parseBody = <T>(schema: z.ZodType<T>, req: Request): T => {
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new AppError(400, 'INVALID_INPUT', parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '));
+    }
+    return parsed.data;
+  };
+  const saveKit = async (id: string, userId: string, mutate: (kit: Kit) => Kit): Promise<StoredKit> => {
+    const stored = await ownedKit(id, userId);
+    let mutated: Kit;
+    try {
+      mutated = mutate(stored.kit);
+    } catch (err) {
+      throw new AppError(400, 'BUILDER_ERROR', err instanceof Error ? err.message : String(err));
+    }
+    const check = validateKit(mutated);
+    if (!check.ok) {
+      throw new AppError(422, 'INVALID_KIT', check.errors.slice(0, 3).map((e) => `${e.path}: ${e.message}`).join('; '));
+    }
+    const saved = await kits.update(id, { kit: check.kit });
+    if (!saved) throw new AppError(404, 'NOT_FOUND', 'Kit not found.');
+    return saved;
+  };
+  const respondKit = (res: Response, saved: StoredKit): void => {
+    res.json({ kit: saved.kit, updatedAt: saved.updatedAt });
+  };
+
+  app.patch('/kits/:id/questions/:qid', requireAuth, asyncHandler(async (req, res) => {
+    const patch = parseBody(EditQuestionSchema, req);
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => editQuestion(k, req.params.qid, patch)));
+  }));
+  app.post('/kits/:id/questions', requireAuth, asyncHandler(async (req, res) => {
+    const input = parseBody(AddQuestionSchema, req);
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => addQuestion(k, input)));
+  }));
+  app.delete('/kits/:id/questions/:qid', requireAuth, asyncHandler(async (req, res) => {
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => deleteQuestion(k, req.params.qid)));
+  }));
+  app.post('/kits/:id/questions/:qid/move', requireAuth, asyncHandler(async (req, res) => {
+    const { category } = parseBody(z.object({ category: CategoryEnum }), req);
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => moveQuestion(k, req.params.qid, category)));
+  }));
+  app.post('/kits/:id/questions/:qid/pin', requireAuth, asyncHandler(async (req, res) => {
+    const { pinned } = parseBody(z.object({ pinned: z.boolean() }), req);
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => setQuestionPinned(k, req.params.qid, pinned)));
+  }));
+  app.post('/kits/:id/reorder', requireAuth, asyncHandler(async (req, res) => {
+    const { category, orderedIds } = parseBody(ReorderSchema, req);
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => reorderCategory(k, category, orderedIds)));
+  }));
+  app.post('/kits/:id/flashcards', requireAuth, asyncHandler(async (req, res) => {
+    const input = parseBody(AddFlashcardSchema, req);
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => addFlashcard(k, input)));
+  }));
+  app.patch('/kits/:id/flashcards/:fid', requireAuth, asyncHandler(async (req, res) => {
+    const patch = parseBody(EditFlashcardSchema, req);
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => editFlashcard(k, req.params.fid, patch)));
+  }));
+  app.delete('/kits/:id/flashcards/:fid', requireAuth, asyncHandler(async (req, res) => {
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => deleteFlashcard(k, req.params.fid)));
+  }));
+  app.patch('/kits/:id/brief', requireAuth, asyncHandler(async (req, res) => {
+    const patch = parseBody(EditBriefSchema, req);
+    respondKit(res, await saveKit(req.params.id, req.userId!, (k) => editBrief(k, patch)));
+  }));
+
+  // Regenerate one section using fresh model output, preserving edits elsewhere.
+  app.post('/kits/:id/sections/:section/regenerate', requireAuth, asyncHandler(async (req, res) => {
+    const generator = deps.sectionGenerator;
+    if (!generator) throw new AppError(501, 'NOT_CONFIGURED', 'Regeneration is not available.');
+    const { id, section } = req.params;
+    const stored = await ownedKit(id, req.userId!);
+    let mutate: (kit: Kit) => Kit;
+    if (isCategory(section)) {
+      const gen = await generator.questions(section, stored.kit.role.requirements);
+      mutate = (k) => regenerateQuestionCategory(k, section, gen);
+    } else if (section === 'flashcards') {
+      const gen = await generator.flashcards(stored.kit.role.requirements);
+      mutate = (k) => regenerateFlashcards(k, gen);
+    } else if (section === 'company_brief') {
+      const gen = await generator.brief(stored.kit.source.company);
+      mutate = (k) => regenerateBrief(k, gen);
+    } else if (section === 'schedule') {
+      mutate = (k) => regenerateSchedule(k);
+    } else {
+      throw new AppError(400, 'INVALID_SECTION', `Unknown section: ${section}`);
+    }
+    respondKit(res, await saveKit(id, req.userId!, mutate));
+  }));
 
   app.use(errorHandler);
   return app;

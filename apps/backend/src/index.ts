@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { createRepositories } from './db/index.js';
 import { buildApp } from './http/app.js';
 import { createProductionRunner } from './pipeline-runner.js';
+import { createProductionSectionGenerator } from './section-generator.js';
 
 /** API server entry point. Wires env-configured persistence + pipeline runner. */
 async function main(): Promise<void> {
@@ -10,9 +11,11 @@ async function main(): Promise<void> {
 
   const repositories = await createRepositories();
   const runner = createProductionRunner();
+  const sectionGenerator = createProductionSectionGenerator();
   const app = buildApp({
     repositories,
     runner,
+    sectionGenerator,
     sessionSecret,
     secureCookies: process.env.NODE_ENV === 'production',
   });

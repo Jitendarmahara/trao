@@ -42,3 +42,6 @@ export * from './schedule/index.js';
 
 // Step 8 — the pipeline that orchestrates every stage end to end.
 export * from './pipeline/index.js';
+
+// Step 11 — the builder: item-state model + section regeneration (preserves edits).
+export * from './builder/index.js';

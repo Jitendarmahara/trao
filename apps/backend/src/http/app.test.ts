@@ -3,6 +3,7 @@ import request from 'supertest';
 import { PipelineError, type Kit } from '@interview-prep-kit/core';
 import { createInMemoryRepositories } from '../db/memory.js';
 import type { PipelineRunner } from '../pipeline-runner.js';
+import type { SectionGenerator } from '../section-generator.js';
 import { buildApp, type AppDeps } from './app.js';
 
 function validKit(company: string): Kit {
@@ -39,7 +40,20 @@ function makeApp(over: Partial<AppDeps> = {}) {
     ...over,
   });
 }
+const stubGenerator: SectionGenerator = {
+  questions: async (category) => [{ requirement_ids: ['r1'], prompt: `REGEN-${category}`, answer_outline: 'A', difficulty: 2 }],
+  flashcards: async () => [{ front: 'RF', back: 'B', requirement_ids: ['r1'] }],
+  brief: async () => ({ summary: 'RB', what_they_do: 'RW', sources: [] }),
+};
 const creds = { email: 'a@example.com', password: 'password123' };
+
+/** Register + create one kit; returns the authed agent and the kit id. */
+async function withKit(over: Partial<AppDeps> = {}) {
+  const agent = request.agent(makeApp({ sectionGenerator: stubGenerator, ...over }));
+  await agent.post('/auth/register').send(creds);
+  const create = await agent.post('/kits').send({ jd: 'JD', companyUrl: 'http://acme', companyName: 'Acme', days: 1 });
+  return { agent, kitId: create.body.job.kitId as string };
+}
 
 describe('auth', () => {
   it('registers, sets a session, and returns the user from /auth/me', async () => {
@@ -141,6 +155,54 @@ describe('kits', () => {
     const bad = await agent.post('/kits').send({ jd: 'JD', companyUrl: 'http://acme', days: 0 });
     expect(bad.status).toBe(400);
     expect(bad.body.error.code).toBe('INVALID_INPUT');
+  });
+
+  it('edits a question (server-authoritative) and persists the edited state', async () => {
+    const { agent, kitId } = await withKit();
+    const patch = await agent.patch(`/kits/${kitId}/questions/q1`).send({ prompt: 'EDITED' });
+    expect(patch.status).toBe(200);
+    const got = await agent.get(`/kits/${kitId}`);
+    const q1 = got.body.kit.questions.find((q: { id: string }) => q.id === 'q1');
+    expect(q1.prompt).toBe('EDITED');
+    expect(q1.state).toBe('edited');
+  });
+
+  it('regenerating a category preserves an edited question and adds fresh ones', async () => {
+    const { agent, kitId } = await withKit();
+    await agent.patch(`/kits/${kitId}/questions/q1`).send({ prompt: 'EDITED' });
+    const regen = await agent.post(`/kits/${kitId}/sections/technical/regenerate`).send({});
+    expect(regen.status).toBe(200);
+    const tech = regen.body.kit.questions.filter((q: { category: string }) => q.category === 'technical');
+    expect(tech.find((q: { id: string }) => q.id === 'q1').prompt).toBe('EDITED'); // survived
+    expect(tech.some((q: { prompt: string }) => q.prompt === 'REGEN-technical')).toBe(true); // fresh added
+  });
+
+  it('adds, then deletes a question via the API (kit stays valid)', async () => {
+    const { agent, kitId } = await withKit();
+    const add = await agent.post(`/kits/${kitId}/questions`).send({ category: 'technical', requirement_ids: ['r1'], prompt: 'MINE', answer_outline: '', difficulty: 2 });
+    expect(add.status).toBe(200);
+    const mine = add.body.kit.questions.find((q: { prompt: string }) => q.prompt === 'MINE');
+    expect(mine.state).toBe('pinned');
+    const del = await agent.delete(`/kits/${kitId}/questions/${mine.id}`);
+    expect(del.status).toBe(200);
+    expect(del.body.kit.questions.some((q: { id: string }) => q.id === mine.id)).toBe(false);
+  });
+
+  it('returns 501 for regenerate when no section generator is configured', async () => {
+    const agent = request.agent(makeApp()); // no sectionGenerator
+    await agent.post('/auth/register').send(creds);
+    const kitId = (await agent.post('/kits').send({ jd: 'JD', companyUrl: 'http://acme', days: 1 })).body.job.kitId;
+    expect((await agent.post(`/kits/${kitId}/sections/technical/regenerate`).send({})).status).toBe(501);
+  });
+
+  it('builder endpoints enforce ownership (another user gets 403)', async () => {
+    const app = makeApp({ sectionGenerator: stubGenerator });
+    const alice = request.agent(app);
+    await alice.post('/auth/register').send(creds);
+    const id = (await alice.post('/kits').send({ jd: 'JD', companyUrl: 'http://acme', days: 1 })).body.job.kitId;
+    const bob = request.agent(app);
+    await bob.post('/auth/register').send({ email: 'b@example.com', password: 'password123' });
+    expect((await bob.patch(`/kits/${id}/questions/q1`).send({ prompt: 'x' })).status).toBe(403);
   });
 
   it('enforces ownership: another user gets 403, unknown kit gets 404', async () => {
