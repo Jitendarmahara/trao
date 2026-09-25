@@ -97,6 +97,27 @@ describe('reorder + move persistence', () => {
     expect(findQ(kit, 'q1')?.order).toBe(1);
   });
 
+  it('a newly added question lands at the END of its category, not the top', () => {
+    // Generated questions carry no `order`; the added one must not jump ahead of them.
+    let kit = addQuestion(baseKit(), { category: 'technical', requirement_ids: ['r1'], prompt: 'MINE', answer_outline: '', difficulty: 2 });
+    const tech = kit.questions.filter((q) => q.category === 'technical').sort((a, b) => Number(a.order) - Number(b.order));
+    expect(tech[0].id).toBe('q1'); // the generated one is still first
+    expect(tech[tech.length - 1].prompt).toBe('MINE'); // the added one is last
+
+    // Every question now shares one contiguous 0..n-1 order scale per category.
+    kit = addQuestion(kit, { category: 'technical', requirement_ids: ['r1'], prompt: 'MINE2', answer_outline: '', difficulty: 2 });
+    const orders = kit.questions.filter((q) => q.category === 'technical').map((q) => q.order).sort((a, b) => Number(a) - Number(b));
+    expect(orders).toEqual([0, 1, 2]);
+  });
+
+  it('moving a question to another category appends it there (no stale order)', () => {
+    let kit = addQuestion(baseKit(), { category: 'technical', requirement_ids: ['r1'], prompt: 'T2', answer_outline: '', difficulty: 2 });
+    kit = reorderCategory(kit, 'technical', [kit.questions.find((q) => q.prompt === 'T2')!.id, 'q1']); // T2 order 0, q1 order 1
+    kit = moveQuestion(kit, 'q1', 'behavioural'); // q1 had order 1 in technical
+    const beh = kit.questions.filter((q) => q.category === 'behavioural').sort((a, b) => Number(a.order) - Number(b.order));
+    expect(beh[beh.length - 1].id).toBe('q1'); // appended last, not slotted by its old order
+  });
+
   it('moving a question between categories keeps its edited (protected) state', () => {
     let kit = editQuestion(baseKit(), 'q1', { prompt: 'E' });
     kit = moveQuestion(kit, 'q1', 'system-design');

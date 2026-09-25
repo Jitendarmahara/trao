@@ -31,6 +31,35 @@ function nextId(prefix: string, existing: string[]): (n?: number) => string {
 }
 
 /**
+ * Put every question's `order` onto ONE consistent per-category scale: 0, 1, 2, …
+ *
+ * This is the linchpin of the ordering state model. Questions minted by the
+ * pipeline/regeneration carry NO `order`, while user-added and reordered ones DO —
+ * a mix the UI can't sort sanely (a missing `order` sorts last, so the first item
+ * that gets any explicit order jumps ahead of everything generated). Renumbering
+ * here, by the CURRENT displayed order (explicit `order` first, then the array's
+ * natural/generation order as the tiebreak), collapses both onto the same integer
+ * scale so nothing leaps around. It also self-heals kits persisted before this fix.
+ */
+function normalizeOrder(kit: Kit): Kit {
+  const byCategory = new Map<string, Question[]>();
+  for (const q of kit.questions) {
+    const list = byCategory.get(q.category) ?? [];
+    list.push(q);
+    byCategory.set(q.category, list);
+  }
+  for (const list of byCategory.values()) {
+    list
+      .map((q, i) => ({ q, i, ord: typeof q.order === 'number' ? q.order : Number.MAX_SAFE_INTEGER }))
+      .sort((a, b) => a.ord - b.ord || a.i - b.i) // stable: array position breaks ties
+      .forEach(({ q }, idx) => {
+        q.order = idx;
+      });
+  }
+  return kit;
+}
+
+/**
  * Restore integrity after any change to the question set. The schedule is a pure
  * function of the current questions + requirements + day count, so we RE-ALLOCATE
  * it deterministically here (over the same `days_available`). This keeps the
@@ -38,7 +67,7 @@ function nextId(prefix: string, existing: string[]): (n?: number) => string {
  * 240 min" days, and newly regenerated questions are re-scheduled immediately
  * instead of leaving early days empty until a separate regenerate. Coverage gaps
  * are recomputed the same way. There is no manual schedule-curation UI, so nothing
- * hand-edited is lost.
+ * hand-edited is lost. Finally we renumber `order` onto one coherent scale.
  */
 function finalize(kit: Kit): Kit {
   kit.schedule = allocateSchedule(kit.questions, kit.role.requirements, kit.schedule.days_available);
@@ -46,7 +75,7 @@ function finalize(kit: Kit): Kit {
     ...kit.coverage,
     uncovered_requirement_ids: findGaps(kit.role.requirements, kit.questions),
   };
-  return kit;
+  return normalizeOrder(kit);
 }
 
 // ── Question item operations ──
@@ -73,7 +102,8 @@ export function addQuestion(
 ): Kit {
   const next = clone(kit);
   const id = nextId('q', next.questions.map((q) => q.id))();
-  const maxOrder = next.questions.reduce((m, q) => Math.max(m, Number(q.order ?? 0)), 0);
+  // No explicit `order`: appended last in the array, so finalize()'s per-category
+  // renumbering places it at the END of its category (never jumping to the top).
   next.questions.push({
     id,
     requirement_ids: input.requirement_ids,
@@ -83,7 +113,6 @@ export function addQuestion(
     difficulty: input.difficulty,
     origin: 'user',
     state: 'pinned',
-    order: maxOrder + 1,
   });
   return finalize(next);
 }
@@ -97,7 +126,9 @@ export function deleteQuestion(kit: Kit, id: string): Kit {
 export function moveQuestion(kit: Kit, id: string, category: QuestionCategory): Kit {
   const next = clone(kit);
   next.questions = next.questions.map((q) =>
-    q.id === id ? { ...q, category, state: q.origin === 'user' ? q.state : 'edited' } : q,
+    // Drop the old per-category `order` so the moved question appends to the END of
+    // its new category; finalize() then renumbers it onto that category's scale.
+    q.id === id ? { ...q, category, order: undefined, state: q.origin === 'user' ? q.state : 'edited' } : q,
   );
   return finalize(next);
 }
