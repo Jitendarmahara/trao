@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'motion/react';
+import { MotionConfig, motion } from 'motion/react';
 import { api, ApiError } from '@/lib/api';
-import { Aurora } from '@/components/ui/aurora';
-import { SplitText } from '@/components/ui/split-text';
-import { Magnet } from '@/components/ui/magnet';
 
-const SPRING = { type: 'spring' as const, stiffness: 200, damping: 25 };
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+// What the kit actually contains — the dossier's contents page, in real terms.
+const CONTENTS = [
+  ['Company brief', 'What they do and how they hire, read from their own site.'],
+  ['Question bank', 'Technical, behavioural and system-design, sorted by what the role demands.'],
+  ['Flashcards', 'Drill the essentials with confidence-weighted repetition.'],
+  ['Study plan', 'Every day up to the interview mapped out, hardest material first.'],
+];
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,99 +32,135 @@ export default function LoginPage() {
       else await api.login(email, password);
       router.push('/kits');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Something went wrong.');
+      setError(err instanceof ApiError ? err.message : 'Something went wrong. Try again.');
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
-      <Aurora />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#09090b] via-transparent to-[#09090b]/70" />
-
-      <div className="grid w-full max-w-5xl items-center gap-12 md:grid-cols-2">
-        <div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1, ...SPRING }}
-            className="mono mb-6 text-xs uppercase tracking-[0.2em] text-violet-400"
+    <MotionConfig reducedMotion="user">
+      <main className="min-h-screen px-6 md:px-12 lg:px-20">
+        <div className="mx-auto grid min-h-screen w-full max-w-6xl items-center gap-x-16 gap-y-12 py-16 lg:grid-cols-[1.15fr_0.85fr]">
+          {/* Masthead — one orchestrated reveal on load */}
+          <motion.div
+            initial="hidden"
+            animate="show"
+            transition={{ staggerChildren: 0.08, delayChildren: 0.05 }}
+            className="max-w-xl"
           >
-            Your unfair interview advantage
-          </motion.p>
-          <h1 className="text-5xl font-semibold leading-[0.95] tracking-tighter sm:text-6xl">
-            <SplitText text="Walk in" />
-            <br />
-            <span className="serif font-normal text-violet-400">
-              <SplitText text="already prepared." delay={0.03} />
-            </span>
-          </h1>
-          <motion.p
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="flex items-center gap-2.5"
+            >
+              <span aria-hidden className="flex h-6 w-6 items-center justify-center rounded-[5px] bg-navy text-[13px] font-semibold text-white">
+                ip
+              </span>
+              <span className="font-display text-[15px] text-ink">Interview Prep Kit</span>
+            </motion.div>
+
+            <motion.h1
+              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.6, ease: EASE }}
+              className="mt-9 font-display text-5xl leading-[1.02] tracking-tightest text-ink sm:text-[3.75rem]"
+            >
+              Walk into the room already prepared.
+            </motion.h1>
+
+            <motion.p
+              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.6, ease: EASE }}
+              className="mt-7 max-w-md text-[17px] leading-relaxed text-ink-soft"
+            >
+              Paste a job description and point us at the company. You get back a researched
+              prep kit built for that role — and the days you have left to study it.
+            </motion.p>
+
+            <motion.dl
+              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.6, ease: EASE }}
+              className="mt-11 border-t border-line"
+            >
+              {CONTENTS.map(([title, desc]) => (
+                <div key={title} className="grid grid-cols-[9.5rem_1fr] gap-4 border-b border-line py-3.5">
+                  <dt className="font-medium text-ink">{title}</dt>
+                  <dd className="text-sm leading-relaxed text-ink-soft">{desc}</dd>
+                </div>
+              ))}
+            </motion.dl>
+          </motion.div>
+
+          {/* Sign-in — the key surface */}
+          <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, ...SPRING }}
-            className="mt-6 max-w-md text-lg leading-relaxed text-zinc-400"
+            transition={{ delay: 0.25, duration: 0.6, ease: EASE }}
+            className="panel-key w-full p-7 sm:p-8"
           >
-            Paste a job description, point us at the company, and get a researched
-            prep kit — questions, flashcards, and a day-by-day plan.
-          </motion.p>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, ...SPRING }}
-          className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-8 backdrop-blur"
-        >
-          <h2 className="mb-1 text-xl font-semibold">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
-          <p className="mb-6 text-sm text-zinc-500">{mode === 'login' ? 'Sign in to your kits.' : 'Start in seconds.'}</p>
-          <form onSubmit={submit} className="space-y-4">
-            <Field label="Email" type="email" value={email} onChange={setEmail} />
-            <Field label="Password" type="password" value={password} onChange={setPassword} minLength={8} />
-            {error && <p className="text-sm text-red-400">{error}</p>}
-            <Magnet>
-              <button
-                type="submit"
-                disabled={busy}
-                className="w-full rounded-full bg-violet-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-violet-500 disabled:opacity-50"
-              >
-                {busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
+            <h2 className="font-display text-2xl tracking-tight text-ink">
+              {mode === 'login' ? 'Welcome back' : 'Create your account'}
+            </h2>
+            <p className="mb-7 mt-1.5 text-sm text-ink-soft">
+              {mode === 'login' ? 'Sign in to pick up where you left off.' : 'Set up in seconds — no card, no fuss.'}
+            </p>
+            <form onSubmit={submit} className="space-y-4">
+              <Field label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
+              <Field
+                label="Password"
+                type="password"
+                value={password}
+                onChange={setPassword}
+                minLength={8}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+              />
+              {error && (
+                <p className="rounded-lg border border-clay/30 bg-clay/5 px-3 py-2 text-sm text-clay" role="alert">
+                  {error}
+                </p>
+              )}
+              <button type="submit" disabled={busy} className="btn-primary w-full py-3">
+                {busy ? 'Just a moment…' : mode === 'login' ? 'Sign in' : 'Create account'}
               </button>
-            </Magnet>
-          </form>
-          <button
-            type="button"
-            onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-            className="mt-5 text-sm text-zinc-400 underline decoration-zinc-700 underline-offset-4 hover:text-zinc-200"
-          >
-            {mode === 'login' ? 'Need an account? Register' : 'Have an account? Sign in'}
-          </button>
-        </motion.div>
-      </div>
-    </main>
+            </form>
+            <div className="mt-6 border-t border-line pt-5 text-sm text-ink-soft">
+              {mode === 'login' ? "Don't have an account yet? " : 'Already have an account? '}
+              <button
+                type="button"
+                onClick={() => { setError(null); setMode(mode === 'login' ? 'register' : 'login'); }}
+                className="font-medium text-navy underline-offset-4 transition hover:underline"
+              >
+                {mode === 'login' ? 'Create one' : 'Sign in'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </main>
+    </MotionConfig>
   );
 }
 
 function Field({
-  label, type, value, onChange, minLength,
+  label, type, value, onChange, minLength, autoComplete,
 }: {
   label: string;
   type: string;
   value: string;
   onChange: (v: string) => void;
   minLength?: number;
+  autoComplete?: string;
 }) {
   return (
-    <label className="block text-sm font-medium text-zinc-300">
-      {label}
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-medium text-ink">{label}</span>
       <input
         type={type}
         required
         minLength={minLength}
+        autoComplete={autoComplete}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1.5 w-full rounded-lg border border-zinc-700 bg-zinc-950/60 px-3 py-2.5 text-sm text-zinc-100 outline-none transition-colors focus:border-violet-500"
+        className="field"
       />
     </label>
   );

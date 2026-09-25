@@ -2,12 +2,117 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
-html, body { background: #09090b; }
-body {
-  @apply text-zinc-100 antialiased;
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+:root {
+  color-scheme: light;
+  --font-optical: 'opsz' 40;
 }
-.serif { font-family: var(--font-serif), Georgia, serif; font-style: italic; }
-.mono { font-family: var(--font-mono), ui-monospace, monospace; }
-::selection { background: rgba(124, 58, 237, 0.35); }
+
+html,
+body {
+  background: theme('colors.paper');
+}
+
+body {
+  @apply text-ink antialiased;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  /* A faint blueprint-grid wash so the paper reads as a working surface,
+     not an empty page. Very low contrast so it never competes with content. */
+  background-image:
+    linear-gradient(to bottom, rgba(31, 42, 84, 0.015) 1px, transparent 1px);
+  background-size: 100% 32px;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-optical-sizing: auto;
+}
+.mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-feature-settings: 'ss01';
+}
+
+::selection {
+  background: rgba(31, 42, 84, 0.14);
+}
+
+/* One consistent, visible focus treatment across the app. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid theme('colors.navy.DEFAULT');
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  /* Text input / textarea / select — one field language everywhere. */
+  .field {
+    @apply w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm text-ink
+           shadow-[inset_0_1px_1px_rgba(26,29,35,0.02)] outline-none transition
+           placeholder:text-ink-faint;
+  }
+  .field:hover {
+    @apply border-line-strong;
+  }
+  .field:focus {
+    @apply border-navy shadow-[0_0_0_3px_theme(colors.navy.tint)];
+  }
+
+  /* Primary action: the navy authority colour. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-navy px-5 py-2.5
+           text-sm font-medium text-white shadow-sm transition
+           hover:bg-navy-hover active:translate-y-px
+           disabled:pointer-events-none disabled:opacity-50;
+  }
+  /* Quiet action: a bordered, low-emphasis control. */
+  .btn-quiet {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border border-line
+           bg-surface px-3 py-1.5 text-xs font-medium text-ink-soft transition
+           hover:border-line-strong hover:text-ink disabled:pointer-events-none disabled:opacity-50;
+  }
+  /* Text-only action. */
+  .btn-text {
+    @apply text-sm text-ink-faint transition hover:text-ink;
+  }
+
+  /* Surfaces. Panels are the working cards; key panels are emphasised with a
+     brass top-rule so the eye knows where the important material lives. */
+  .panel {
+    @apply rounded-2xl border border-line bg-surface shadow-card;
+  }
+  .panel-key {
+    @apply relative overflow-hidden rounded-2xl border border-line bg-white shadow-key;
+  }
+  .panel-key::before {
+    content: '';
+    @apply absolute inset-x-0 top-0 h-[3px] bg-brass;
+  }
+
+  /* A meaningful section label — small caps, not tracked-out all-caps mono. */
+  .kicker {
+    @apply text-[13px] font-semibold text-ink-soft;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.02em;
+  }
+
+  /* Identifier chip for real codes (requirement IDs, etc.). */
+  .chip-id {
+    @apply mono rounded-md bg-navy-tint px-1.5 py-0.5 text-[11px] font-medium text-navy;
+  }
+  /* Keyboard key. */
+  .kbd {
+    @apply mono inline-flex min-w-[1.4em] items-center justify-center rounded border border-line-strong
+           bg-white px-1.5 py-0.5 text-[11px] text-ink-soft shadow-[0_1px_0_theme(colors.line.strong)];
+  }
+}
+
+/* Respect reduced-motion: kill the load reveal, keep layout usable. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise {
+    animation: none !important;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
+}
