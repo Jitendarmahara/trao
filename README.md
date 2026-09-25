@@ -107,8 +107,18 @@ npm run lint           # ESLint
 npm test               # Vitest — 175 tests
 ```
 
-**Get a free LLM key:** create one at <https://console.groq.com> → *API Keys*, and paste it into
-`LLM_API_KEY` in `.env`. The other LLM vars already default to Groq's free tier.
+**Get a free LLM key:** the app is provider-agnostic — any OpenAI-compatible endpoint works by
+setting `LLM_BASE_URL`, `LLM_API_KEY` and `LLM_MODEL`. Two options:
+
+- **Groq (free tier)** — `LLM_BASE_URL=https://api.groq.com/openai/v1`. Get a key at
+  <https://console.groq.com> → *API Keys*.
+- **DeepSeek** — `LLM_BASE_URL=https://api.deepseek.com`, `LLM_MODEL=deepseek-chat`. Key at
+  <https://platform.deepseek.com>.
+
+> **Note on the deployed instance:** Groq's free tier is **heavily rate-limited** (tokens-per-minute),
+> and during testing the multi-call pipeline hits that limit and fails part-way. So the **public
+> deployment uses DeepSeek** (`deepseek-chat`) for reliable end-to-end runs. Nothing in the code is
+> DeepSeek-specific — it's the same three env vars; Groq still works for light/local use.
 
 **Run the app locally:**
 
