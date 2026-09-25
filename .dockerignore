@@ -1,0 +1,32 @@
+# Keep the build context small and secrets out of the image.
+**/node_modules
+node_modules
+
+# Build outputs
+apps/web/.next
+.next
+**/dist
+**/*.tsbuildinfo
+
+# The old, unrelated Vite prototype (not part of this app)
+web/
+
+# Secrets & local env — Compose reads ./.env for substitution, but it must
+# never be copied INTO the image.
+.env
+.env.*
+!.env.example
+!.env.deploy.example
+
+# VCS / tooling / local noise
+.git
+.gitignore
+.github
+evaluation-results
+fixtures/*.local.json
+*.pdf
+chat.txt
+Dockerfile
+.dockerignore
+docker-compose.yml
+DEPLOY.md

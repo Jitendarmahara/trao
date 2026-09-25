@@ -29,3 +29,6 @@ chat.txt
 
 # build info
 *.tsbuildinfo
+
+# old Vite prototype (superseded by apps/web) — not part of the app
+web/

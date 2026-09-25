@@ -1,0 +1,81 @@
+# AI Interview Prep Kit — production stack for a single EC2 host behind Cloudflare.
+#
+#   Internet ──HTTPS──▶ Cloudflare ──HTTP──▶ EC2 :80 ──▶ frontend :3000
+#                                                          │  /api/*  (Next rewrite)
+#                                                          ▼
+#                                                       backend :4000 ──▶ mongo :27017
+#
+# Only the frontend is published (port 80). backend and mongo stay on the private
+# Compose network. Secrets come from ./.env (see .env.deploy.example).
+#
+#   docker compose up -d --build
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  backend:
+    build:
+      context: .
+      args:
+        BACKEND_URL: http://backend:4000
+    image: interview-prep-kit:latest
+    restart: unless-stopped
+    command: ["npm", "run", "-w", "@interview-prep-kit/backend", "start"]
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      MONGODB_URI: mongodb://mongo:27017/interview_prep_kit
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env (see .env.deploy.example)}
+      LLM_BASE_URL: ${LLM_BASE_URL:?Set LLM_BASE_URL in .env}
+      LLM_API_KEY: ${LLM_API_KEY:?Set LLM_API_KEY in .env}
+      LLM_MODEL: ${LLM_MODEL:?Set LLM_MODEL in .env}
+      # In production the crawler must refuse private/loopback targets (SSRF gate).
+      ALLOW_LOCAL_URLS: "false"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:4000/auth/me',()=>process.exit(0)).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  frontend:
+    build:
+      context: .
+      args:
+        BACKEND_URL: http://backend:4000
+    image: interview-prep-kit:latest
+    restart: unless-stopped
+    command: ["npm", "run", "-w", "@interview-prep-kit/web", "start"]
+    environment:
+      NODE_ENV: production
+      # next start reads PORT; the shared image defaults it to 4000, so pin 3000 here.
+      PORT: "3000"
+      # Parity with the value baked into the build (used by the Next /api rewrite).
+      BACKEND_URL: http://backend:4000
+    ports:
+      - "80:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/login',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mongo-data:
