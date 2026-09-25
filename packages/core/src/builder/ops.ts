@@ -31,19 +31,17 @@ function nextId(prefix: string, existing: string[]): (n?: number) => string {
 }
 
 /**
- * Restore referential integrity + coverage after any change to the question set:
- * prune schedule references to questions that no longer exist (keeping the kit
- * valid and preserving the user's schedule edits), and recompute the deterministic
- * coverage gaps. It does NOT re-allocate the schedule — that is the explicit
- * `regenerateSchedule` op, so editing questions never silently discards a
- * hand-edited schedule.
+ * Restore integrity after any change to the question set. The schedule is a pure
+ * function of the current questions + requirements + day count, so we RE-ALLOCATE
+ * it deterministically here (over the same `days_available`). This keeps the
+ * schedule always coherent — no dangling references, no phantom "0 questions ·
+ * 240 min" days, and newly regenerated questions are re-scheduled immediately
+ * instead of leaving early days empty until a separate regenerate. Coverage gaps
+ * are recomputed the same way. There is no manual schedule-curation UI, so nothing
+ * hand-edited is lost.
  */
 function finalize(kit: Kit): Kit {
-  const questionIds = new Set(kit.questions.map((q) => q.id));
-  kit.schedule.days = kit.schedule.days.map((d) => ({
-    ...d,
-    question_ids: d.question_ids.filter((id) => questionIds.has(id)),
-  }));
+  kit.schedule = allocateSchedule(kit.questions, kit.role.requirements, kit.schedule.days_available);
   kit.coverage = {
     ...kit.coverage,
     uncovered_requirement_ids: findGaps(kit.role.requirements, kit.questions),

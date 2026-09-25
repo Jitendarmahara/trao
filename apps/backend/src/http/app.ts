@@ -343,11 +343,20 @@ export function buildApp(deps: AppDeps): Express {
 
   // Regenerate one section using fresh model output, preserving edits elsewhere.
   app.post('/kits/:id/sections/:section/regenerate', requireAuth, asyncHandler(async (req, res) => {
-    const generator = deps.sectionGenerator;
-    if (!generator) throw new AppError(501, 'NOT_CONFIGURED', 'Regeneration is not available.');
     const { id, section } = req.params;
     const stored = await ownedKit(id, req.userId!);
     let mutate: (kit: Kit) => Kit;
+
+    // Schedule regeneration is deterministic (pure arithmetic) — it needs no LLM,
+    // so it works even when no section generator is configured.
+    if (section === 'schedule') {
+      mutate = (k) => regenerateSchedule(k);
+      respondKit(res, await saveKit(id, req.userId!, mutate));
+      return;
+    }
+
+    const generator = deps.sectionGenerator;
+    if (!generator) throw new AppError(501, 'NOT_CONFIGURED', 'Regeneration is not available.');
     if (isCategory(section)) {
       const gen = await generator.questions(section, stored.kit.role.requirements);
       mutate = (k) => regenerateQuestionCategory(k, section, gen);
@@ -357,8 +366,6 @@ export function buildApp(deps: AppDeps): Express {
     } else if (section === 'company_brief') {
       const gen = await generator.brief(stored.kit.source.company);
       mutate = (k) => regenerateBrief(k, gen);
-    } else if (section === 'schedule') {
-      mutate = (k) => regenerateSchedule(k);
     } else {
       throw new AppError(400, 'INVALID_SECTION', `Unknown section: ${section}`);
     }
