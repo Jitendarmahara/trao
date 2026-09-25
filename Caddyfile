@@ -1,0 +1,21 @@
+# Reverse proxy for the AI Interview Prep Kit.
+#
+# Cloudflare terminates HTTPS and forwards to this instance over HTTP on :80
+# (Cloudflare SSL/TLS mode = Flexible). Caddy is the single public entry point;
+# it forwards everything to the Next.js frontend, which in turn proxies /api/*
+# to the backend internally.
+#
+# To move to end-to-end TLS later, replace the `:80` site address with your
+# domain name and either add `tls internal` (self-signed → Cloudflare "Full")
+# or let Caddy fetch a real certificate (→ Cloudflare "Full (strict)").
+
+:80 {
+	encode zstd gzip
+
+	# Real client IP from Cloudflare (so logs/rate-limits see the visitor, not CF).
+	# These are Cloudflare's edge ranges; Caddy trusts the CF-Connecting-IP header
+	# only from them.
+	reverse_proxy frontend:3000 {
+		header_up X-Real-IP {http.request.header.CF-Connecting-IP}
+	}
+}

@@ -65,8 +65,7 @@ services:
       PORT: "3000"
       # Parity with the value baked into the build (used by the Next /api rewrite).
       BACKEND_URL: http://backend:4000
-    ports:
-      - "80:3000"
+    # No host port — Caddy is the only thing published to the internet.
     depends_on:
       backend:
         condition: service_healthy
@@ -77,5 +76,22 @@ services:
       retries: 5
       start_period: 30s
 
+  # Public entry point. Cloudflare (Flexible) forwards HTTP :80 here; Caddy
+  # reverse-proxies to the frontend. This is the only service exposed to the host.
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      frontend:
+        condition: service_healthy
+
 volumes:
   mongo-data:
+  caddy-data:
+  caddy-config:
