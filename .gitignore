@@ -15,8 +15,8 @@ out/
 *.log
 npm-debug.log*
 
-# test coverage
-coverage/
+# test coverage output (root only — must NOT match packages/core/src/coverage)
+/coverage/
 
 # os / editor
 .DS_Store
